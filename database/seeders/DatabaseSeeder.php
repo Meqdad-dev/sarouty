@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // ── Subscription Plans ──────────────────────────────────────
+        $this->call(SubscriptionPlanSeeder::class);
+
         // ── Administrateur ──────────────────────────────────────────
         User::create([
             'name'              => 'Admin DarMaroc',
@@ -281,7 +284,7 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info('✅ Base de données peuplée avec succès !');
         $this->command->table(['Rôle', 'Email', 'Mot de passe'], [
-            ['Admin',       'admin@darmaroc.ma', 'password'],
+            ['Admin',       'admin@sarouty.ma', 'sarouty123'],
             ['Agent',       'ahmed@agent.ma',    'password'],
             ['Particulier', 'user1@test.ma',     'password'],
         ]);

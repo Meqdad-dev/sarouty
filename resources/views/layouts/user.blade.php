@@ -130,7 +130,9 @@
         @media (max-width: 1024px) {
             .admin-sidebar {
                 position: fixed;
-                inset: 0 auto 0 0;
+                top: 0;
+                bottom: 0;
+                left: 0;
                 height: 100vh;
                 z-index: 40;
                 transform: translateX(-100%);
@@ -143,17 +145,21 @@
                 background: rgba(15,23,42,.45);
                 z-index: 30;
             }
+            .admin-main {
+                width: 100%;
+                max-width: 100vw;
+            }
         }
     </style>
     @stack('styles')
 </head>
-<body class="h-full" x-data="userLayout()" x-init="init()">
-<div class="admin-shell">
+<body class="h-full bg-[var(--bg)] text-[var(--text)]" x-data="userLayout()" x-init="init()">
+<div class="admin-shell flex min-h-screen relative w-full overflow-hidden">
     <template x-if="mobileSidebarOpen">
-        <div class="admin-overlay lg:hidden" @click="mobileSidebarOpen = false"></div>
+        <div class="admin-overlay lg:hidden fixed inset-0 bg-slate-900/40 z-30" @click="mobileSidebarOpen = false"></div>
     </template>
 
-    <aside class="admin-sidebar flex-shrink-0 flex flex-col h-screen sticky top-0 overflow-y-auto"
+    <aside class="admin-sidebar flex-shrink-0 flex flex-col h-screen lg:sticky top-0 overflow-y-auto"
            :class="{ 'open': mobileSidebarOpen }">
         <div class="px-6 py-6 border-b" style="border-color: var(--border)">
             <div class="flex items-center justify-center">
@@ -285,9 +291,9 @@
         </div>
     </aside>
 
-    <div class="admin-main flex flex-col min-h-screen">
+    <div class="admin-main flex-1 flex flex-col min-h-screen min-w-0 w-full">
         <header class="admin-topbar">
-            <div class="px-5 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="px-4 lg:px-8 py-4 flex items-center justify-between gap-3 sm:gap-4">
                 <div class="flex items-center gap-3 min-w-0 flex-1">
                     <button type="button" class="lg:hidden flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl panel"
                             @click="mobileSidebarOpen = true">

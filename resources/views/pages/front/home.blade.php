@@ -137,63 +137,6 @@
 </section>
 
 {{-- ═══════════════════════════════════════════════════════════════
-     ANNONCES VEDETTES
-═══════════════════════════════════════════════════════════════ --}}
-@if($featuredListings->isNotEmpty())
-<section class="py-20 bg-sand-light">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-end justify-between mb-12">
-            <div>
-                <p class="text-gold text-sm font-medium uppercase tracking-widest mb-2">Sélection exclusive</p>
-                <h2 class="font-display text-4xl font-bold text-ink">Coups de cœur</h2>
-            </div>
-            <a href="{{ route('listings.index') }}" class="text-sm font-medium text-gold hover:underline hidden sm:block">
-                Voir toutes les annonces →
-            </a>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            @foreach($featuredListings as $listing)
-                @include('components.listing-card', ['listing' => $listing])
-            @endforeach
-        </div>
-    </div>
-</section>
-@endif
-
-{{-- ═══════════════════════════════════════════════════════════════
-     CATÉGORIES
-═══════════════════════════════════════════════════════════════ --}}
-<section class="py-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-            <p class="text-gold text-sm font-medium uppercase tracking-widest mb-2">Explorer</p>
-            <h2 class="font-display text-4xl font-bold text-ink">Par type de transaction</h2>
-        </div>
-
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
-            @foreach([
-                ['type' => 'vente',    'icon' => '<path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>', 'label' => 'Vente',          'desc' => 'Achetez votre bien',         'color' => 'bg-gold/10 hover:bg-gold/20 border-gold/20 text-gold'],
-                ['type' => 'location', 'icon' => '<path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />', 'label' => 'Location',       'desc' => 'Louez un appartement',       'color' => 'bg-terracotta/10 hover:bg-terracotta/20 border-terracotta/20 text-terracotta'],
-                ['type' => 'neuf',     'icon' => '<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />', 'label' => 'Immobilier neuf','desc' => 'Programmes neufs',           'color' => 'bg-forest/10 hover:bg-forest/20 border-forest/20 text-forest'],
-                ['type' => 'vacances', 'icon' => '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />', 'label' => 'Vacances',       'desc' => 'Location saisonnière',       'color' => 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-600'],
-            ] as $cat)
-                <a href="{{ route('listings.index', ['type' => $cat['type']]) }}"
-                   class="group border rounded-2xl p-6 text-center transition-all duration-300 hover:shadow-lg {{ $cat['color'] }}">
-                    <div class="mb-4 group-hover:scale-110 transition-transform flex justify-center">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            {!! $cat['icon'] !!}
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold text-ink text-lg mb-1">{{ $cat['label'] }}</h3>
-                    <p class="text-ink/50 text-sm">{{ $cat['desc'] }}</p>
-                </a>
-            @endforeach
-        </div>
-    </div>
-</section>
-
-{{-- ═══════════════════════════════════════════════════════════════
      ESTIMATION DE BIEN
 ═══════════════════════════════════════════════════════════════ --}}
 <section class="py-20 relative overflow-hidden" style="background: linear-gradient(135deg, #1A1410 0%, #2D1F12 50%, #1A2810 100%);">
@@ -296,6 +239,65 @@
 </section>
 
 {{-- ═══════════════════════════════════════════════════════════════
+     ANNONCES VEDETTES
+═══════════════════════════════════════════════════════════════ --}}
+@if($featuredListings->isNotEmpty())
+<section class="py-20 bg-sand-light">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-end justify-between mb-12">
+            <div>
+                <p class="text-gold text-sm font-medium uppercase tracking-widest mb-2">Sélection exclusive</p>
+                <h2 class="font-display text-4xl font-bold text-ink">Coups de cœur</h2>
+            </div>
+            <a href="{{ route('listings.index') }}" class="text-sm font-medium text-gold hover:underline hidden sm:block">
+                Voir toutes les annonces →
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            @foreach($featuredListings as $listing)
+                @include('components.listing-card', ['listing' => $listing])
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+{{-- ═══════════════════════════════════════════════════════════════
+     CATÉGORIES
+═══════════════════════════════════════════════════════════════ --}}
+<section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <p class="text-gold text-sm font-medium uppercase tracking-widest mb-2">Explorer</p>
+            <h2 class="font-display text-4xl font-bold text-ink">Par type de transaction</h2>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+            @foreach([
+                ['type' => 'vente',    'icon' => '<path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>', 'label' => 'Vente',          'desc' => 'Achetez votre bien',         'color' => 'bg-gold/10 hover:bg-gold/20 border-gold/20 text-gold'],
+                ['type' => 'location', 'icon' => '<path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />', 'label' => 'Location',       'desc' => 'Louez un appartement',       'color' => 'bg-terracotta/10 hover:bg-terracotta/20 border-terracotta/20 text-terracotta'],
+                ['type' => 'neuf',     'icon' => '<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />', 'label' => 'Immobilier neuf','desc' => 'Programmes neufs',           'color' => 'bg-forest/10 hover:bg-forest/20 border-forest/20 text-forest'],
+                ['type' => 'vacances', 'icon' => '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />', 'label' => 'Vacances',       'desc' => 'Location saisonnière',       'color' => 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-600'],
+            ] as $cat)
+                <a href="{{ route('listings.index', ['type' => $cat['type']]) }}"
+                   class="group border rounded-2xl p-6 text-center transition-all duration-300 hover:shadow-lg {{ $cat['color'] }}">
+                    <div class="mb-4 group-hover:scale-110 transition-transform flex justify-center">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {!! $cat['icon'] !!}
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-ink text-lg mb-1">{{ $cat['label'] }}</h3>
+                    <p class="text-ink/50 text-sm">{{ $cat['desc'] }}</p>
+                </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+
+
+{{-- ═══════════════════════════════════════════════════════════════
      MODAL ESTIMATION (6 étapes)
 ═══════════════════════════════════════════════════════════════ --}}
 <div id="estimation-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-6" style="background:rgba(0,0,0,0.80);backdrop-filter:blur(6px);">
@@ -318,11 +320,11 @@
             </div>
             {{-- Barre de progression --}}
             <div class="flex gap-1 mt-3">
-                @for($i=1;$i<=6;$i++)
+                @for($i=1;$i<=7;$i++)
                 <div id="estim-bar-{{$i}}" class="h-1 flex-1 rounded-full transition-all duration-500 {{ $i===1?'bg-gold':'bg-white/20' }}"></div>
                 @endfor
             </div>
-            <div id="step-label" class="text-white/40 text-xs mt-1.5">Étape 1 sur 6</div>
+            <div id="step-label" class="text-white/40 text-xs mt-1.5">Étape 1 sur 7</div>
         </div>
 
         {{-- ── Corps scrollable ── --}}
@@ -500,31 +502,15 @@
                 </button>
             </div>
 
-            {{-- ─ ÉTAPE 6 : Résultats + Infos contact ─ --}}
+            {{-- ─ ÉTAPE 6 : Infos contact ─ --}}
             <div id="estim-step-6" class="estim-step hidden">
-                {{-- Résultat --}}
-                <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-5 mb-5 text-center relative overflow-hidden">
-                    <div class="absolute inset-0 opacity-10" style="background:radial-gradient(circle at 70% 30%,#C8963E,transparent);"></div>
-                    <div class="relative">
-                        <div class="text-white/50 text-xs mb-1">Valeur estimée</div>
-                        <div id="estim-price-mid" class="font-display text-3xl font-bold text-gold mb-0.5">—</div>
-                        <div class="text-white/40 text-xs">MAD</div>
-                        <div id="estim-result-desc" class="text-white/40 text-xs mt-2"></div>
-                        <div class="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/10">
-                            <div><div class="text-white/40 text-xs mb-0.5">Estimation basse</div><div id="estim-price-min" class="text-white font-semibold text-xs">—</div></div>
-                            <div class="border-x border-white/10"><div class="text-white/40 text-xs mb-0.5">Prix au m²</div><div id="estim-price-sqm" class="text-gold font-semibold text-xs">—</div></div>
-                            <div><div class="text-white/40 text-xs mb-0.5">Estimation haute</div><div id="estim-price-max" class="text-white font-semibold text-xs">—</div></div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Formulaire contact --}}
                 <div class="bg-gray-50 rounded-2xl p-5 space-y-4">
-                    <h5 class="font-bold text-gray-900 text-base">Vos informations <span class="text-gray-400 font-normal text-sm">(optionnel)</span></h5>
+                    <h4 class="font-bold text-gray-900 text-lg mb-1">Vos informations</h4>
+                    <p class="text-gray-500 text-sm mb-5">Veuillez renseigner vos coordonnées pour découvrir votre estimation.</p>
 
                     {{-- Type utilisateur --}}
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-2">Quel type d'utilisateur êtes-vous ?</label>
+                        <label class="block text-xs font-semibold text-gray-600 mb-2">Quel type d'utilisateur êtes-vous ? *</label>
                         <div class="flex flex-wrap gap-1.5">
                             @foreach([['proprietaire','Propriétaire'],['acheteur','Acheteur'],['locataire','Locataire'],['agent','Agent'],['investisseur','Investisseur']] as [$uv,$ul])
                             <button type="button" onclick="eSelectUserType('{{$uv}}')" data-utype="{{$uv}}"
@@ -568,27 +554,60 @@
 
                     {{-- Nom / Email / Téléphone --}}
                     <div class="grid grid-cols-1 gap-3">
-                        <input type="text" id="estim-name" placeholder="Votre nom"
-                               class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold outline-none w-full">
-                        <input type="email" id="estim-email" placeholder="Votre email"
-                               class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold outline-none w-full">
-                        <input type="tel" id="estim-phone" placeholder="Votre téléphone (ex: 06 12 34 56 78)"
-                               class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold outline-none w-full">
+                        <div>
+                            <input type="text" id="estim-name" placeholder="Votre nom *" required
+                                   class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold outline-none w-full">
+                            <span id="err-name" class="text-red-500 text-xs hidden">Veuillez entrer votre nom.</span>
+                        </div>
+                        <div>
+                            <input type="email" id="estim-email" placeholder="Votre email *" required
+                                   class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold outline-none w-full">
+                            <span id="err-email" class="text-red-500 text-xs hidden">Veuillez entrer une adresse email valide.</span>
+                        </div>
+                        <div>
+                            <input type="tel" id="estim-phone" placeholder="Votre téléphone *" required
+                                   class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold outline-none w-full">
+                            <span id="err-phone" class="text-red-500 text-xs hidden">Veuillez entrer votre numéro de téléphone.</span>
+                        </div>
                     </div>
 
-                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-3">
-                        <p class="text-amber-800 text-xs">⚠️ <strong>Estimation indicative.</strong> Valeur calculée à partir de données de marché. Consultez un agent pour une évaluation précise.</p>
-                    </div>
+                    <button onclick="eSubmitInfo()" id="btn-submit-info"
+                            class="mt-4 w-full bg-gold hover:bg-gold-dark text-white font-bold py-3.5 rounded-2xl transition-all shadow-lg shadow-gold/30 text-base flex items-center justify-center gap-2">
+                        Voir mon estimation
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </button>
+                    <div id="estim-save-error" class="hidden text-center text-red-500 font-semibold text-sm py-2">Une erreur est survenue, veuillez réessayer.</div>
+                </div>
+            </div>
 
-                    <div class="flex gap-2">
-                        <button onclick="resetEstimation()" class="flex-1 py-2.5 rounded-xl border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-semibold transition-all text-sm">Nouvelle</button>
-                        <button onclick="eSaveEstimation()" id="btn-save-estim"
-                                class="flex-1 py-2.5 rounded-xl bg-gold hover:bg-gold-dark text-white font-bold transition-all text-sm flex items-center justify-center gap-1.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            Enregistrer
-                        </button>
+            {{-- ─ ÉTAPE 7 : Résultats ─ --}}
+            <div id="estim-step-7" class="estim-step hidden">
+                <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 mb-6 text-center relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-10" style="background:radial-gradient(circle at 70% 30%,#C8963E,transparent);"></div>
+                    <div class="relative">
+                        <div class="text-white/50 text-sm mb-2">Valeur estimée</div>
+                        <div id="estim-price-mid" class="font-display text-4xl font-bold text-gold mb-1">—</div>
+                        <div class="text-white/40 text-sm">MAD</div>
+                        <div id="estim-result-desc" class="text-white/40 text-sm mt-3"></div>
+                        <div class="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/10">
+                            <div><div class="text-white/40 text-xs mb-1">Estimation basse</div><div id="estim-price-min" class="text-white font-semibold text-sm">—</div></div>
+                            <div class="border-x border-white/10"><div class="text-white/40 text-xs mb-1">Prix au m²</div><div id="estim-price-sqm" class="text-gold font-semibold text-sm">—</div></div>
+                            <div><div class="text-white/40 text-xs mb-1">Estimation haute</div><div id="estim-price-max" class="text-white font-semibold text-sm">—</div></div>
+                        </div>
                     </div>
-                    <div id="estim-save-msg" class="hidden text-center text-green-600 font-semibold text-sm py-2">✅ Votre estimation a été enregistrée !</div>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+                    <p class="text-amber-800 text-sm leading-relaxed">⚠️ <strong>Estimation indicative.</strong> Valeur calculée à partir de données de marché. Consultez un agent pour une évaluation précise.</p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button onclick="resetEstimation()" class="flex-1 py-3 rounded-xl border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-semibold transition-all text-sm">Nouvelle estimation</button>
+                    @if(!auth()->check() || !auth()->user()->isClient())
+                    <a href="{{ auth()->check() ? route('user.listings.create') : route('register') }}" class="flex-1 py-3 rounded-xl bg-gold hover:bg-gold-dark text-white font-semibold transition-all text-sm text-center">Publier une annonce</a>
+                    @else
+                    <a href="{{ route('listings.index') }}" class="flex-1 py-3 rounded-xl bg-gold hover:bg-gold-dark text-white font-semibold transition-all text-sm text-center">Voir les annonces</a>
+                    @endif
                 </div>
             </div>
 
@@ -610,188 +629,7 @@
     </div>
 </div>
 
-        {{-- Header --}}
-        <div class="relative px-8 pt-8 pb-6" style="background: linear-gradient(135deg, #1A1410 0%, #2D1F12 100%);">
-            <div class="absolute top-0 right-0 w-40 h-40 rounded-full opacity-10" style="background: radial-gradient(circle, #C8963E, transparent);"></div>
-            <button onclick="closeEstimation()" class="absolute top-4 right-4 w-9 h-9 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full text-white transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-10 h-10 bg-gold rounded-xl flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-white font-bold text-xl">Estimation de votre bien</h3>
-                    <p class="text-white/50 text-sm">Gratuit et sans inscription</p>
-                </div>
-            </div>
-            {{-- Progress bar --}}
-            <div class="flex gap-1.5 mt-4">
-                @for($i=1; $i<=4; $i++)
-                <div id="step-bar-{{ $i }}" class="h-1 flex-1 rounded-full transition-all duration-500 {{ $i===1 ? 'bg-gold' : 'bg-white/20' }}"></div>
-                @endfor
-            </div>
-            <div id="step-label" class="text-white/40 text-xs mt-2">Étape 1 sur 4</div>
-        </div>
 
-        {{-- Steps --}}
-        <div class="px-8 py-8">
-            {{-- STEP 1: Type de bien --}}
-            <div id="estim-step-1" class="estim-step">
-                <h4 class="font-semibold text-gray-900 dark:text-white text-xl mb-2">Quel type de bien ?</h4>
-                <p class="text-gray-500 text-sm mb-6">Sélectionnez le type correspondant à votre propriété</p>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="property-type-grid">
-                    @foreach([
-                        ['appartement','Appartement','M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'],
-                        ['villa','Villa / Maison','M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z'],
-                        ['bureau','Bureau / Local','M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'],
-                        ['terrain','Terrain','M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z'],
-                        ['riad','Riad','M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
-                        ['commerce','Commerce','M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z'],
-                    ] as [$val, $lbl, $icon])
-                    <button type="button" onclick="selectPropertyType('{{ $val }}')"
-                            class="estim-type-btn flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-gray-200 hover:border-gold hover:bg-gold/5 transition-all duration-200 group"
-                            data-type="{{ $val }}">
-                        <svg class="w-8 h-8 text-gray-400 group-hover:text-gold transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="{{ $icon }}"/>
-                        </svg>
-                        <span class="text-sm font-medium text-gray-700 group-hover:text-gold transition-colors">{{ $lbl }}</span>
-                    </button>
-                    @endforeach
-                </div>
-            </div>
-
-            {{-- STEP 2: Localisation --}}
-            <div id="estim-step-2" class="estim-step hidden">
-                <h4 class="font-semibold text-gray-900 dark:text-white text-xl mb-2">Où se situe votre bien ?</h4>
-                <p class="text-gray-500 text-sm mb-6">La ville influence fortement le prix au m²</p>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="city-grid">
-                    @foreach(['Casablanca','Rabat','Marrakech','Tanger','Agadir','Fès','Meknès','Oujda','El Jadida','Tétouan','Essaouira','Ifrane'] as $city)
-                    <button type="button" onclick="selectCity('{{ $city }}')"
-                            class="estim-city-btn px-4 py-3 rounded-xl border-2 border-gray-200 hover:border-gold hover:bg-gold/5 text-sm font-medium text-gray-700 hover:text-gold transition-all duration-200"
-                            data-city="{{ $city }}">{{ $city }}</button>
-                    @endforeach
-                </div>
-            </div>
-
-            {{-- STEP 3: Surface & caractéristiques --}}
-            <div id="estim-step-3" class="estim-step hidden">
-                <h4 class="font-semibold text-gray-900 dark:text-white text-xl mb-2">Caractéristiques du bien</h4>
-                <p class="text-gray-500 text-sm mb-6">Renseignez les informations clés pour affiner l'estimation</p>
-                <div class="space-y-5">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Surface habitable (m²) <span class="text-red-500">*</span></label>
-                        <div class="flex items-center gap-3">
-                            <input type="range" id="estim-surface-range" min="20" max="1000" step="10" value="100"
-                                   oninput="document.getElementById('estim-surface-input').value=this.value; updateSurfaceLabel();"
-                                   class="flex-1 h-2 rounded-lg accent-gold cursor-pointer">
-                            <input type="number" id="estim-surface-input" min="20" max="5000" value="100"
-                                   oninput="document.getElementById('estim-surface-range').value=Math.min(this.value,1000); updateSurfaceLabel();"
-                                   class="w-24 border border-gray-200 rounded-xl px-3 py-2 text-sm text-center font-semibold focus:ring-2 focus:ring-gold/30 focus:border-gold outline-none">
-                            <span class="text-gray-500 text-sm">m²</span>
-                        </div>
-                        <div class="flex justify-between text-xs text-gray-400 mt-1"><span>20 m²</span><span id="estim-surface-label" class="font-semibold text-gold">100 m²</span><span>1000+ m²</span></div>
-                    </div>
-                    <div id="rooms-field">
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Nombre de pièces</label>
-                        <div class="flex gap-2 flex-wrap">
-                            @foreach([1,2,3,4,5,'6+'] as $r)
-                            <button type="button" onclick="selectRooms('{{ $r }}')"
-                                    class="estim-rooms-btn w-12 h-12 rounded-xl border-2 border-gray-200 hover:border-gold hover:bg-gold/5 text-sm font-semibold text-gray-700 hover:text-gold transition-all"
-                                    data-rooms="{{ $r }}">{{ $r }}</button>
-                            @endforeach
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">État du bien</label>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                            @foreach([['neuf','Neuf ✨'],['excellent','Excellent'],['bon','Bon état'],['a_renover','À rénover']] as [$condVal, $condLbl])
-                            <button type="button" onclick="selectCondition('{{ $condVal }}')"
-                                    class="estim-cond-btn py-2.5 px-3 rounded-xl border-2 border-gray-200 hover:border-gold hover:bg-gold/5 text-xs font-medium text-gray-700 hover:text-gold transition-all"
-                                    data-cond="{{ $condVal }}">{{ $condLbl }}</button>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-                <button onclick="goToResults()"
-                        class="mt-8 w-full bg-gold hover:bg-gold-dark text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-gold/30 text-lg">
-                    Calculer mon estimation
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                </button>
-            </div>
-
-            {{-- STEP 4: Résultats --}}
-            <div id="estim-step-4" class="estim-step hidden">
-                <div class="text-center mb-6">
-                    <div class="inline-flex w-16 h-16 bg-green-100 rounded-full items-center justify-center mb-4">
-                        <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                    <h4 class="font-bold text-gray-900 text-2xl mb-1">Votre estimation</h4>
-                    <p id="estim-result-desc" class="text-gray-500 text-sm"></p>
-                </div>
-
-                {{-- Fourchette --}}
-                <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 mb-6 text-center relative overflow-hidden">
-                    <div class="absolute inset-0 opacity-10" style="background: radial-gradient(circle at 70% 30%, #C8963E, transparent);"></div>
-                    <div class="relative">
-                        <div class="text-white/50 text-sm mb-2">Valeur estimée</div>
-                        <div id="estim-price-mid" class="font-display text-4xl font-bold text-gold mb-1">—</div>
-                        <div class="text-white/40 text-sm">MAD</div>
-                        <div class="grid grid-cols-3 gap-4 mt-5 pt-5 border-t border-white/10">
-                            <div>
-                                <div class="text-white/40 text-xs mb-1">Estimation basse</div>
-                                <div id="estim-price-min" class="text-white font-semibold text-sm">—</div>
-                            </div>
-                            <div class="border-x border-white/10">
-                                <div class="text-white/40 text-xs mb-1">Prix au m²</div>
-                                <div id="estim-price-sqm" class="text-gold font-semibold text-sm">—</div>
-                            </div>
-                            <div>
-                                <div class="text-white/40 text-xs mb-1">Estimation haute</div>
-                                <div id="estim-price-max" class="text-white font-semibold text-sm">—</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Disclaimer --}}
-                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
-                    <p class="text-amber-800 text-xs leading-relaxed">
-                        <strong>⚠️ Estimation indicative uniquement.</strong> Cette valeur est calculée à partir de données de marché et peut varier selon l'étage, l'exposition, le quartier exact et d'autres critères. Consultez un agent pour une évaluation précise.
-                    </p>
-                </div>
-
-                <div class="flex flex-col sm:flex-row gap-3">
-                    <button onclick="resetEstimation()" class="flex-1 py-3 rounded-xl border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-semibold transition-all text-sm">
-                        Nouvelle estimation
-                    </button>
-                    @if(!auth()->check() || !auth()->user()->isClient())
-                    <a href="{{ auth()->check() ? route('user.listings.create') : route('register') }}"
-                       class="flex-1 py-3 rounded-xl bg-gold hover:bg-gold-dark text-white font-semibold transition-all text-sm text-center">
-                        Publier mon annonce
-                    </a>
-                    @else
-                    <a href="{{ route('listings.index') }}"
-                       class="flex-1 py-3 rounded-xl bg-gold hover:bg-gold-dark text-white font-semibold transition-all text-sm text-center">
-                        Voir les annonces
-                    </a>
-                    @endif
-                </div>
-            </div>
-        </div>
-
-        {{-- Footer navigation (steps 1-3) --}}
-        <div id="estim-nav" class="flex items-center justify-between px-8 pb-6">
-            <button id="estim-prev" onclick="estimPrev()" class="hidden text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                Retour
-            </button>
-            <div class="flex-1"></div>
-        </div>
-    </div>
-</div>
 
 {{-- ═══════════════════════════════════════════════════════════════
      ANNONCES RÉCENTES
@@ -918,17 +756,17 @@ function estimGoTo(n) {
     if (!target) return;
     target.classList.remove('hidden');
     // Progress bars
-    for(let i=1;i<=6;i++){
+    for(let i=1;i<=7;i++){
         const b = document.getElementById('estim-bar-'+i);
         if(b){ b.style.backgroundColor = i<=n ? '#C8963E' : 'rgba(255,255,255,0.2)'; }
     }
-    document.getElementById('step-label').textContent = 'Étape '+n+' sur 6';
+    document.getElementById('step-label').textContent = 'Étape '+n+' sur 7';
     // Prev button
     const prev = document.getElementById('estim-prev');
     if(prev) prev.style.visibility = n>1 ? 'visible' : 'hidden';
-    // Publish link step 6
+    // Publish link step 7
     const pl = document.getElementById('estim-publish-link');
-    if(pl) { n===6 ? pl.classList.remove('hidden') : pl.classList.add('hidden'); }
+    if(pl) { n===7 ? pl.classList.remove('hidden') : pl.classList.add('hidden'); }
     eStep = n;
 }
 function estimPrev(){ if(eStep>1) estimGoTo(eStep-1); }
@@ -1122,13 +960,34 @@ function animateVal(id,from,to,dur,fmtFn){
 }
 
 // ═══════════════════════════════════════════════════════════
-// ENREGISTREMENT BDD
+// SOUMISSION INFO & ENREGISTREMENT BDD
 // ═══════════════════════════════════════════════════════════
-async function eSaveEstimation(){
-    const btn = document.getElementById('btn-save-estim');
+async function eSubmitInfo() {
+    const nameInput = document.getElementById('estim-name');
+    const emailInput = document.getElementById('estim-email');
+    const phoneInput = document.getElementById('estim-phone');
+
+    document.getElementById('err-name').classList.add('hidden');
+    document.getElementById('err-email').classList.add('hidden');
+    document.getElementById('err-phone').classList.add('hidden');
+    document.getElementById('estim-save-error').classList.add('hidden');
+
+    let isValid = true;
+    if(!nameInput.value.trim()){ document.getElementById('err-name').classList.remove('hidden'); isValid=false; }
+    if(!emailInput.value.trim() || !emailInput.value.includes('@')){ document.getElementById('err-email').classList.remove('hidden'); isValid=false; }
+    if(!phoneInput.value.trim()){ document.getElementById('err-phone').classList.remove('hidden'); isValid=false; }
+
+    if(!isValid) return;
+
+    if(!eD.userType){
+        alert("Veuillez sélectionner votre type d'utilisateur.");
+        return;
+    }
+
+    const btn = document.getElementById('btn-submit-info');
     if(!btn) return;
     btn.disabled = true;
-    btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Enregistrement...';
+    btn.innerHTML = '<svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Enregistrement...';
 
     const payload = {
         property_type:          eD.type,
@@ -1159,9 +1018,9 @@ async function eSaveEstimation(){
         wants_professional_help:eD.wantsPro===true,
         is_owner:               eD.isOwner===true,
         timeline:               eD.timeline,
-        contact_name:           document.getElementById('estim-name').value||null,
-        contact_email:          document.getElementById('estim-email').value||null,
-        contact_phone:          document.getElementById('estim-phone').value||null,
+        contact_name:           nameInput.value,
+        contact_email:          emailInput.value,
+        contact_phone:          phoneInput.value,
         _token:                 document.querySelector('meta[name="csrf-token"]')?.content,
     };
 
@@ -1173,15 +1032,17 @@ async function eSaveEstimation(){
         });
         const data = await res.json();
         if(data.success){
-            btn.classList.add('hidden');
-            document.getElementById('estim-save-msg').classList.remove('hidden');
+            // Passer à l'étape 7 (Résultat)
+            estimGoTo(7);
         } else {
+            document.getElementById('estim-save-error').classList.remove('hidden');
             btn.disabled=false;
-            btn.innerHTML='Enregistrer';
+            btn.innerHTML='Voir mon estimation';
         }
     } catch(err){
+        document.getElementById('estim-save-error').classList.remove('hidden');
         btn.disabled=false;
-        btn.innerHTML='Réessayer';
+        btn.innerHTML='Voir mon estimation';
     }
 }
 
@@ -1200,11 +1061,12 @@ function resetEstimation(){
     updateSurfaceLabel();
     const sub=document.getElementById('amenity-sub-fields');
     if(sub) sub.innerHTML='';
-    const msg=document.getElementById('estim-save-msg');
-    if(msg) msg.classList.add('hidden');
-    const btn=document.getElementById('btn-save-estim');
-    if(btn){ btn.disabled=false; btn.classList.remove('hidden'); btn.innerHTML='<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Enregistrer'; }
+    const err=document.getElementById('estim-save-error');
+    if(err) err.classList.add('hidden');
+    const btn=document.getElementById('btn-submit-info');
+    if(btn){ btn.disabled=false; btn.innerHTML='Voir mon estimation <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>'; }
     ['estim-name','estim-email','estim-phone'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    ['err-name','err-email','err-phone'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.add('hidden'); });
     estimGoTo(1);
 }
 
