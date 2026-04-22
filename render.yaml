@@ -1,0 +1,92 @@
+services:
+  # ── Web Service ─────────────────────────────────────────────────────────
+  - type: web
+    name: sarouty
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /
+
+    envVars:
+      # ── Application ──────────────────────────────────────────────────
+      - key: APP_NAME
+        value: Sarouty
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_URL
+        value: https://sarouty.onrender.com   # à changer après déploiement
+      - key: APP_LOCALE
+        value: fr
+      - key: APP_FALLBACK_LOCALE
+        value: fr
+
+      # ── Base de données PostgreSQL ────────────────────────────────────
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: sarouty-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: sarouty-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: sarouty-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: sarouty-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: sarouty-db
+          property: password
+
+      # ── Session / Cache ───────────────────────────────────────────────
+      - key: SESSION_DRIVER
+        value: file
+      - key: SESSION_LIFETIME
+        value: "120"
+      - key: CACHE_STORE
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+
+      # ── Logs ──────────────────────────────────────────────────────────
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: error
+
+      # ── Fichiers / Storage ────────────────────────────────────────────
+      - key: FILESYSTEM_DISK
+        value: public
+
+      # ── Brevo (Emails) ────────────────────────────────────────────────
+      - key: BREVO_API_KEY
+        sync: false       # à saisir manuellement dans le dashboard Render
+      - key: BREVO_SENDER_EMAIL
+        sync: false
+      - key: BREVO_SENDER_NAME
+        value: Sarouty
+
+      # ── Stripe ───────────────────────────────────────────────────────
+      - key: STRIPE_KEY
+        sync: false
+      - key: STRIPE_SECRET
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+
+  # ── Base de données PostgreSQL (free tier Render) ───────────────────────
+databases:
+  - name: sarouty-db
+    plan: free
+    databaseName: sarouty
+    user: sarouty

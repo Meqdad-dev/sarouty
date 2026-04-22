@@ -1,0 +1,12 @@
+# ── Render (Primaire) ─────────────────────────────────────────────────────────
+# Render utilise le Dockerfile automatiquement.
+# La config principale est dans render.yaml
+
+# ── Railway (Fallback) ────────────────────────────────────────────────────────
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
