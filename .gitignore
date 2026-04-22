@@ -30,7 +30,7 @@ test_geo.php
 /public/brevo-test.html
 
 # Fichiers vidéo trop lourds pour GitHub
-*.mp4
+# *.mp4
 *.mov
 *.avi
 /public/herosection/
