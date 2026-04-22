@@ -33,4 +33,4 @@ test_geo.php
 # *.mp4
 *.mov
 *.avi
-/public/herosection/
+# /public/herosection/
