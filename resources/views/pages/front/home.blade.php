@@ -266,31 +266,107 @@
 {{-- ═══════════════════════════════════════════════════════════════
      CATÉGORIES
 ═══════════════════════════════════════════════════════════════ --}}
-<section class="py-20">
+<section class="py-24 bg-gradient-to-b from-white to-sand-light">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-            <p class="text-gold text-sm font-medium uppercase tracking-widest mb-2">Explorer</p>
-            <h2 class="font-display text-4xl font-bold text-ink">Par type de transaction</h2>
+        <div class="text-center mb-16">
+            <div class="flex items-center justify-center gap-4 mb-4">
+                <div class="h-px bg-gold/50 w-12 sm:w-24"></div>
+                <p class="text-gold text-xs sm:text-sm font-bold uppercase tracking-[0.2em]">Explorer</p>
+                <div class="h-px bg-gold/50 w-12 sm:w-24"></div>
+            </div>
+            <h2 class="font-display text-4xl sm:text-5xl font-bold text-ink">Par type de transaction</h2>
         </div>
 
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @foreach([
-                ['type' => 'vente',    'icon' => '<path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>', 'label' => 'Vente',          'desc' => 'Achetez votre bien',         'color' => 'bg-gold/10 hover:bg-gold/20 border-gold/20 text-gold'],
-                ['type' => 'location', 'icon' => '<path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />', 'label' => 'Location',       'desc' => 'Louez un appartement',       'color' => 'bg-terracotta/10 hover:bg-terracotta/20 border-terracotta/20 text-terracotta'],
-                ['type' => 'neuf',     'icon' => '<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />', 'label' => 'Immobilier neuf','desc' => 'Programmes neufs',           'color' => 'bg-forest/10 hover:bg-forest/20 border-forest/20 text-forest'],
-                ['type' => 'vacances', 'icon' => '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />', 'label' => 'Vacances',       'desc' => 'Location saisonnière',       'color' => 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-600'],
+                ['type' => 'vente',    'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>', 'label' => 'Achat & Vente',    'desc' => 'Devenez propriétaire'],
+                ['type' => 'location', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />', 'label' => 'Location',       'desc' => 'Trouvez votre loyer'],
+                ['type' => 'neuf',     'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />', 'label' => 'Immobilier Neuf', 'desc' => 'Programmes récents'],
+                ['type' => 'vacances', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />', 'label' => 'Vacances',       'desc' => 'Locations saisonnières'],
             ] as $cat)
                 <a href="{{ route('listings.index', ['type' => $cat['type']]) }}"
-                   class="group border rounded-2xl p-6 text-center transition-all duration-300 hover:shadow-lg {{ $cat['color'] }}">
-                    <div class="mb-4 group-hover:scale-110 transition-transform flex justify-center">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            {!! $cat['icon'] !!}
-                        </svg>
+                   class="group relative bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:-translate-y-2 hover:shadow-2xl hover:shadow-gold/20 transition-all duration-300 overflow-hidden flex flex-col h-full">
+                    
+                    {{-- Watermark Icon --}}
+                    <svg class="absolute -right-6 -bottom-6 w-32 h-32 text-gold opacity-[0.03] group-hover:scale-110 group-hover:opacity-10 transition-all duration-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {!! $cat['icon'] !!}
+                    </svg>
+
+                    <div class="relative z-10 flex flex-col flex-1">
+                        <div class="w-14 h-14 rounded-2xl bg-gold/10 text-gold flex items-center justify-center mb-6 group-hover:bg-gold group-hover:text-white transition-colors duration-500 shadow-inner">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {!! $cat['icon'] !!}
+                            </svg>
+                        </div>
+                        <h3 class="font-display font-bold text-2xl text-ink mb-2">{{ $cat['label'] }}</h3>
+                        <p class="text-ink/60 text-sm font-medium flex items-center gap-2 mt-auto">
+                            {{ $cat['desc'] }}
+                            <svg class="w-4 h-4 text-gold opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            </svg>
+                        </p>
                     </div>
-                    <h3 class="font-semibold text-ink text-lg mb-1">{{ $cat['label'] }}</h3>
-                    <p class="text-ink/50 text-sm">{{ $cat['desc'] }}</p>
                 </a>
             @endforeach
+        </div>
+    </div>
+</section>
+
+{{-- ═══════════════════════════════════════════════════════════════
+     DESTINATIONS
+═══════════════════════════════════════════════════════════════ --}}
+<section class="py-20 bg-sand-light">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <div class="flex items-center justify-center gap-4 mb-4">
+                <div class="h-px bg-gold/50 w-12 sm:w-24"></div>
+                <p class="text-gold text-xs sm:text-sm font-bold uppercase tracking-[0.2em]">Nos destinations immobilières</p>
+                <div class="h-px bg-gold/50 w-12 sm:w-24"></div>
+            </div>
+            <h2 class="font-display text-4xl sm:text-5xl font-bold text-ink mb-6">
+                Trouver des biens immobiliers au Maroc
+            </h2>
+            <p class="text-ink/60 text-lg max-w-2xl mx-auto">
+                Bénéficiez d'un accompagnement dans toutes les régions du royaume
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach([
+                ['city' => 'Casablanca', 'img' => "images/cities/casablanca.jpg", 'fallback' => 'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?auto=format&fit=crop&w=800&q=80', 'desc' => 'Capitale économique'],
+                ['city' => 'Marrakech', 'img' => "images/cities/marrakech.jpg", 'fallback' => 'https://images.unsplash.com/photo-1548013146-72479768bca0?auto=format&fit=crop&w=800&q=80', 'desc' => 'La ville ocre'],
+                ['city' => 'Rabat', 'img' => "images/cities/rabat.jpg", 'fallback' => 'https://images.unsplash.com/photo-1594911762140-5e5d165f12df?auto=format&fit=crop&w=800&q=80', 'desc' => 'Capitale administrative'],
+                ['city' => 'Tanger', 'img' => "images/cities/tanger.jpg", 'fallback' => 'https://images.unsplash.com/photo-1574426575971-ce49931cc32b?auto=format&fit=crop&w=800&q=80', 'desc' => 'La perle du Nord'],
+                ['city' => 'Agadir', 'img' => "images/cities/agadir.jpg", 'fallback' => 'https://images.unsplash.com/photo-1616892523533-5c02dc21cc99?auto=format&fit=crop&w=800&q=80', 'desc' => 'Capitale du Souss'],
+                ['city' => 'Fès', 'img' => "images/cities/fes.jpg", 'fallback' => 'https://images.unsplash.com/photo-1555581122-eb168bb1d8fc?auto=format&fit=crop&w=800&q=80', 'desc' => 'Capitale spirituelle'],
+            ] as $dest)
+                <a href="{{ route('listings.index', ['city' => $dest['city']]) }}" class="group relative h-80 rounded-2xl overflow-hidden block shadow-lg hover:shadow-2xl transition-shadow">
+                    <img src="{{ asset($dest['img']) }}" onerror="this.onerror=null; this.src='{{ $dest['fallback'] }}';" alt="{{ $dest['city'] }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-6 text-left">
+                        <h3 class="text-3xl font-display font-bold text-white mb-1">{{ $dest['city'] }}</h3>
+                        <p class="text-white/80 text-sm flex items-center gap-2">
+                            <span>{{ $dest['desc'] }}</span>
+                            <svg class="w-4 h-4 text-gold opacity-0 -translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            </svg>
+                        </p>
+                    </div>
+                </a>
+            @endforeach
+        </div>
+
+        <div class="mt-12 text-center">
+            <a href="{{ route('listings.index') }}"
+               class="inline-flex items-center gap-2.5 border-2 border-ink text-ink hover:bg-ink hover:text-white font-semibold px-8 py-3.5 rounded-xl transition-all duration-300 group">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                </svg>
+                Autres villes — Voir toutes les annonces
+                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+            </a>
         </div>
     </div>
 </section>
@@ -660,6 +736,55 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                 </svg>
             </a>
+        </div>
+    </div>
+</section>
+
+{{-- ═══════════════════════════════════════════════════════════════
+     ÉTAPES DE PUBLICATION
+═══════════════════════════════════════════════════════════════ --}}
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <p class="text-gold text-sm font-medium uppercase tracking-widest mb-2">Simple et rapide</p>
+            <h2 class="font-display text-4xl font-bold text-ink">4 étapes pour publier votre annonce</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
+            {{-- Ligne de connexion (desktop) --}}
+            <div class="hidden lg:block absolute top-12 left-[12%] right-[12%] h-[2px] bg-gradient-to-r from-gold/10 via-gold to-gold/10 z-0"></div>
+
+            @foreach([
+                ['num' => '1', 'title' => 'Créer un compte', 'desc' => 'Inscrivez-vous gratuitement en quelques clics pour accéder à votre espace personnel.', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>'],
+                ['num' => '2', 'title' => 'Décrire le bien', 'desc' => 'Ajoutez vos plus belles photos, fixez le prix et détaillez les caractéristiques.', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>'],
+                ['num' => '3', 'title' => 'Validation', 'desc' => 'Notre équipe vérifie et valide votre annonce pour garantir la qualité de la plateforme.', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>'],
+                ['num' => '4', 'title' => 'En ligne !', 'desc' => 'Votre bien est visible par des milliers d\'acheteurs et locataires potentiels.', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>'],
+            ] as $step)
+                <div class="relative z-10 flex flex-col items-center text-center group">
+                    <div class="w-24 h-24 rounded-full bg-white border-4 border-sand shadow-xl flex items-center justify-center mb-6 relative group-hover:border-gold transition-colors duration-500">
+                        <svg class="w-10 h-10 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {!! $step['icon'] !!}
+                        </svg>
+                        <div class="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-ink text-white font-bold flex items-center justify-center text-sm shadow-lg group-hover:bg-gold transition-colors duration-500">
+                            {{ $step['num'] }}
+                        </div>
+                    </div>
+                    <h3 class="font-display font-bold text-xl text-ink mb-3">{{ $step['title'] }}</h3>
+                    <p class="text-ink/60 text-sm leading-relaxed px-2">{{ $step['desc'] }}</p>
+                </div>
+            @endforeach
+        </div>
+        
+        <div class="mt-16 text-center">
+            @if(!auth()->check() || !auth()->user()->isClient())
+            <a href="{{ auth()->check() ? route('user.listings.create') : route('register') }}"
+               class="inline-flex items-center gap-2 bg-ink hover:bg-ink/80 text-white font-semibold px-8 py-3.5 rounded-xl transition-all shadow-lg hover:-translate-y-1">
+                Commencer maintenant
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+            </a>
+            @endif
         </div>
     </div>
 </section>

@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+@php cache()->put('admin_viewed_users_' . auth()->id(), now()); @endphp
 
 @section('title', 'Gestion des Utilisateurs – Sarouty')
 @section('page_title', 'Gestion des Utilisateurs')

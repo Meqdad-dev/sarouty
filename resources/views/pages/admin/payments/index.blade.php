@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+@php cache()->put('admin_viewed_payments_' . auth()->id(), now()); @endphp
 
 @section('title', 'Historique des paiements – Sarouty')
 @section('page_title', 'Historique des paiements')

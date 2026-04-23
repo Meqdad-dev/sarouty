@@ -384,9 +384,19 @@ class AdminController extends Controller
             'priority'         => 'nullable|integer|min:0|max:10',
             'images'           => 'nullable|array',
             'images.*'         => 'image|mimes:jpg,jpeg,png,webp|max:10240',
+            'delete_images'    => 'nullable|array',
+            'delete_images.*'  => 'integer|exists:listing_images,id',
         ]);
 
         $listing->update($validated);
+
+        if ($request->has('delete_images')) {
+            $imagesToDelete = $listing->images()->whereIn('id', $request->delete_images)->get();
+            foreach ($imagesToDelete as $img) {
+                Storage::disk('public')->delete($img->path);
+                $img->delete();
+            }
+        }
 
         if ($request->hasFile('images')) {
             $startIndex = $listing->images()->max('order') ?? -1;
@@ -394,10 +404,15 @@ class AdminController extends Controller
                 $order = $startIndex + $i + 1;
                 $path = $image->store("listings/{$listing->id}", 'public');
                 $listing->images()->create(['path' => $path, 'order' => $order]);
-                if (empty($listing->thumbnail)) {
-                    $listing->update(['thumbnail' => $path]);
-                }
             }
+        }
+
+        // Update Thumbnail if it was deleted or doesn't exist
+        $firstImage = $listing->images()->orderBy('order')->first();
+        if ($firstImage) {
+            $listing->update(['thumbnail' => $firstImage->path]);
+        } else {
+            $listing->update(['thumbnail' => null]);
         }
 
         Cache::forget('admin_dashboard_stats');

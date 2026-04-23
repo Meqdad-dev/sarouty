@@ -9,11 +9,11 @@
     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         
         <!-- Header -->
-        <div style="background: linear-gradient(135deg, #10B981, #059669); padding: 30px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;">
-                Dar<span style="color: #f4d03f;">Maroc</span>
-            </h1>
-            <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 14px;">
+        <div style="background: linear-gradient(135deg, #1A1410, #2D1F12); padding: 36px; text-align: center;">
+            <a href="{{ url('/') }}" style="text-decoration:none;">
+                <h1 style="margin:0;font-size:28px;font-weight:700;color:#C8963E;letter-spacing:-0.5px;">Sarouty</h1>
+            </a>
+            <p style="margin:6px 0 0;color:rgba(255,255,255,0.6);font-size:13px;">
                 Nouveau contact pour votre annonce
             </p>
         </div>
@@ -21,24 +21,24 @@
         <!-- Content -->
         <div style="padding: 30px;">
             <p style="color: #333; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-                Bonjour <strong style="color: #10B981;">{{ $message->receiver->name ?? 'cher annonceur' }}</strong>,
+                Bonjour <strong style="color: #C8963E;">{{ $message->receiver->name ?? 'cher annonceur' }}</strong>,
             </p>
 
             <p style="color: #666; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0;">
                 Un client potentiel vient de vous envoyer un message concernant votre annonce :<br>
-                <strong style="color: #10B981;">"{{ $message->listing->title ?? 'Annonce immobilière' }}"</strong>.
+                <strong style="color: #C8963E;">"{{ $message->listing->title ?? 'Annonce immobilière' }}"</strong>.
             </p>
 
             <!-- Client Info Box -->
-            <div style="background-color: #f8fafc; border-left: 4px solid #10B981; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
-                <p style="color: #10B981; font-size: 12px; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+            <div style="background-color: #f8fafc; border-left: 4px solid #C8963E; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+                <p style="color: #C8963E; font-size: 12px; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
                     Informations du contact
                 </p>
                 <div style="color: #333; font-size: 14px; line-height: 1.8; margin: 0;">
                     <strong>Nom :</strong> {{ $message->sender_name }}<br>
-                    <strong>Email :</strong> <a href="mailto:{{ $message->sender_email }}" style="color: #10B981;">{{ $message->sender_email }}</a><br>
+                    <strong>Email :</strong> <a href="mailto:{{ $message->sender_email }}" style="color: #C8963E;">{{ $message->sender_email }}</a><br>
                     @if($message->sender_phone)
-                    <strong>Téléphone :</strong> <a href="tel:{{ $message->sender_phone }}" style="color: #10B981;">{{ $message->sender_phone }}</a><br>
+                    <strong>Téléphone :</strong> <a href="tel:{{ $message->sender_phone }}" style="color: #C8963E;">{{ $message->sender_phone }}</a><br>
                     @endif
                 </div>
             </div>
@@ -56,7 +56,7 @@
             <!-- CTA Button -->
             <div style="text-align: center; margin: 30px 0;">
                 <a href="{{ route('user.messages.show', $message->id) }}" 
-                   style="display: inline-block; background: linear-gradient(135deg, #10B981, #059669); color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 30px; font-weight: 600; font-size: 14px;">
+                   style="display: inline-block; background: #C8963E; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 30px; font-weight: 600; font-size: 14px;">
                     Répondre depuis le tableau de bord
                 </a>
             </div>
@@ -64,7 +64,7 @@
             <p style="color: #888; font-size: 13px; line-height: 1.6; margin: 20px 0 0 0;">
                 L'équipe de modération a validé ce message. Vous pouvez recontacter ce client directement ou utiliser votre messagerie interne sur la plateforme.<br><br>
                 Cordialement,<br>
-                <strong style="color: #10B981;">L'équipe {{ config('app.name', 'Sarouty') }}</strong>
+                <strong style="color: #C8963E;">L'équipe {{ config('app.name', 'Sarouty') }}</strong>
             </p>
         </div>
 

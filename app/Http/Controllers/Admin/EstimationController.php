@@ -94,6 +94,7 @@ class EstimationController extends Controller
         $recipientName = $estimation->contact_name ?: 'Cher client';
         $registerUrl   = url('/register');
         $listingsUrl   = url('/annonces');
+        $homeUrl       = url('/');
         $year          = now()->year;
 
         $htmlContent = '<!DOCTYPE html>
@@ -111,7 +112,9 @@ class EstimationController extends Controller
 
         <tr>
           <td style="background:linear-gradient(135deg,#1A1410,#2D1F12);padding:36px 40px;text-align:center;">
-            <h1 style="margin:0;font-size:28px;font-weight:700;color:#C8963E;letter-spacing:-0.5px;">Sarouty</h1>
+            <a href="' . $homeUrl . '" style="text-decoration:none;">
+                <h1 style="margin:0;font-size:28px;font-weight:700;color:#C8963E;letter-spacing:-0.5px;">Sarouty</h1>
+            </a>
             <p style="margin:6px 0 0;color:rgba(255,255,255,0.6);font-size:13px;">Immobilier au Maroc</p>
           </td>
         </tr>
@@ -142,7 +145,12 @@ class EstimationController extends Controller
             <p style="margin:0 0 12px;font-size:14px;color:#6b7280;">
               Vous pouvez aussi parcourir nos annonces disponibles :
             </p>
-            <a href="' . $listingsUrl . '" style="color:#C8963E;font-size:14px;">' . $listingsUrl . '</a>
+            <a href="' . $listingsUrl . '" style="color:#C8963E;font-size:14px;display:block;margin-bottom:16px;">' . $listingsUrl . '</a>
+
+            <p style="margin:0 0 12px;font-size:14px;color:#6b7280;">
+              Ou découvrir l\'ensemble de nos services sur notre site internet :
+            </p>
+            <a href="' . $homeUrl . '" style="color:#C8963E;font-size:14px;">' . $homeUrl . '</a>
           </td>
         </tr>
 
@@ -162,7 +170,7 @@ class EstimationController extends Controller
 </html>';
 
         try {
-            $response = Http::withHeaders([
+            $response = Http::withoutVerifying()->withHeaders([
                 'api-key'      => $apiKey,
                 'Content-Type' => 'application/json',
                 'Accept'       => 'application/json',

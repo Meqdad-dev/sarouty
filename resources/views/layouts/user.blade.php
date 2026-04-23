@@ -15,6 +15,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -112,6 +113,9 @@
             background: var(--nav-active-bg);
             color: var(--nav-active-text);
         }
+        .nav-item.active .nav-badge {
+            display: none !important;
+        }
         .nav-icon {
             width: 38px;
             height: 38px;
@@ -154,7 +158,7 @@
     @stack('styles')
 </head>
 <body class="h-full bg-[var(--bg)] text-[var(--text)]" x-data="userLayout()" x-init="init()">
-<div class="admin-shell flex min-h-screen relative w-full overflow-hidden">
+<div class="admin-shell flex h-screen w-full overflow-hidden">
     <template x-if="mobileSidebarOpen">
         <div class="admin-overlay lg:hidden fixed inset-0 bg-slate-900/40 z-30" @click="mobileSidebarOpen = false"></div>
     </template>
@@ -215,6 +219,12 @@
                     </svg>
                 </span>
                 <span>Messages</span>
+                @php
+                    $unreadMessages = \App\Models\Message::where('receiver_id', auth()->id())->where('is_read', false)->count();
+                @endphp
+                @if($unreadMessages > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $unreadMessages }}</span>
+                @endif
             </a>
 
             <a href="{{ route('user.favorites') }}" class="nav-item nav-ajax {{ request()->routeIs('user.favorites') ? 'active' : '' }}">
@@ -235,6 +245,15 @@
                     </svg>
                 </span>
                 <span>Notifications</span>
+                @php
+                    $unreadNotifications = \DB::table('user_notifications')
+                        ->where('user_id', auth()->id())
+                        ->where('read', false)
+                        ->count();
+                @endphp
+                @if($unreadNotifications > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $unreadNotifications }}</span>
+                @endif
             </a>
             @endif
 
@@ -291,8 +310,8 @@
         </div>
     </aside>
 
-    <div class="admin-main flex-1 flex flex-col min-h-screen min-w-0 w-full">
-        <header class="admin-topbar">
+    <div class="admin-main flex-1 flex flex-col h-screen overflow-y-auto min-w-0 w-full">
+        <header class="admin-topbar sticky top-0 z-20 bg-[var(--bg)]/90 backdrop-blur-md border-b" style="border-color: var(--border)">
             <div class="px-4 lg:px-8 py-4 flex items-center justify-between gap-3 sm:gap-4">
                 <div class="flex items-center gap-3 min-w-0 flex-1">
                     <button type="button" class="lg:hidden flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl panel"
@@ -383,6 +402,11 @@
                 const savedTheme = localStorage.getItem('user-theme');
                 this.theme = savedTheme || 'light';
                 document.documentElement.classList.toggle('dark', this.theme === 'dark');
+
+                // Masquer le badge pour le lien actif
+                setTimeout(() => {
+                    document.querySelectorAll('.nav-ajax.active .nav-badge').forEach(b => b.style.display = 'none');
+                }, 100);
             },
             toggleTheme() {
                 this.theme = this.theme === 'dark' ? 'light' : 'dark';

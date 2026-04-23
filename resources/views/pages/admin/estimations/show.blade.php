@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 @section('title', 'Détail estimation – Sarouty Admin')
-
+@section('page_title', 'Détail de l\'estimation')
+@section('page_subtitle', 'Consultez les caractéristiques et les coordonnées du client')
 @section('content')
 <div class="p-6 lg:p-8 space-y-6 max-w-4xl mx-auto">
 

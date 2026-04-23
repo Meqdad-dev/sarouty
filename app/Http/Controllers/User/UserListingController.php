@@ -299,6 +299,10 @@ class UserListingController extends Controller
             'terrace'     => 'boolean',
             'security'    => 'boolean',
             'is_sponsored_requested' => 'nullable|boolean',
+            'images'      => 'nullable|array|max:10',
+            'images.*'    => 'image|mimes:jpg,jpeg,png,webp|max:5120',
+            'delete_images' => 'nullable|array',
+            'delete_images.*' => 'integer|exists:listing_images,id',
         ]);
 
         $validated = $this->hydrateCoordinates($validated);
@@ -333,6 +337,44 @@ class UserListingController extends Controller
                     'admin_notes' => 'Sponsorisation incluse via abonnement ' . auth()->user()->plan,
                 ]
             );
+        }
+
+        // --- Handle Image Deletions ---
+        if ($request->has('delete_images')) {
+            $imagesToDelete = $listing->images()->whereIn('id', $request->delete_images)->get();
+            foreach ($imagesToDelete as $img) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($img->path);
+                $img->delete();
+            }
+        }
+
+        // --- Handle New Images ---
+        if ($request->hasFile('images')) {
+            // Get current max order
+            $currentMaxOrder = $listing->images()->max('order') ?? -1;
+            
+            $maxImages = auth()->user()->plan_features['max_images'] ?? 5;
+            $currentCount = $listing->images()->count();
+            
+            foreach ($request->file('images') as $image) {
+                if ($currentCount >= $maxImages) break;
+                
+                $currentMaxOrder++;
+                $path = $image->store("listings/{$listing->id}", 'public');
+                $listing->images()->create([
+                    'path' => $path,
+                    'order' => $currentMaxOrder
+                ]);
+                $currentCount++;
+            }
+        }
+
+        // Update Thumbnail if it was deleted or doesn't exist
+        $firstImage = $listing->images()->orderBy('order')->first();
+        if ($firstImage) {
+            $listing->update(['thumbnail' => $firstImage->path]);
+        } else {
+            $listing->update(['thumbnail' => null]);
         }
 
         return redirect()->route('user.listings.show', $listing)

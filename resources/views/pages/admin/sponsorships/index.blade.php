@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+@php cache()->put('admin_viewed_sponsors_' . auth()->id(), now()); @endphp
 
 @section('title', 'Sponsorisations – Sarouty')
 @section('page_title', 'Sponsorisations')

@@ -76,11 +76,40 @@ class EmailService
     public function sendContactMessage(Message $message): void
     {
         try {
-            Mail::send('emails.contact-message', ['message' => $message], function ($mail) use ($message) {
-                $mail->to($message->receiver->email, $message->receiver->name)
-                     ->replyTo($message->sender_email, $message->sender_name)
-                     ->subject("💬 Nouveau message – {$message->listing->title}");
-            });
+            $htmlContent = view('emails.contact-message', ['message' => $message])->render();
+            
+            $apiKey = env('BREVO_API_KEY', config('services.brevo.key'));
+            $senderEmail = env('BREVO_SENDER_EMAIL', config('services.brevo.sender_email', 'noreply@sarouty.com'));
+            $senderName = env('BREVO_SENDER_NAME', config('services.brevo.sender_name', 'Sarouty'));
+
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'api-key' => $apiKey,
+                'accept' => 'application/json',
+                'content-type' => 'application/json',
+            ])
+            ->withoutVerifying()
+            ->post('https://api.brevo.com/v3/smtp/email', [
+                'sender' => [
+                    'name' => $senderName,
+                    'email' => $senderEmail
+                ],
+                'to' => [
+                    [
+                        'email' => $message->receiver->email,
+                        'name' => $message->receiver->name
+                    ]
+                ],
+                'replyTo' => [
+                    'email' => $message->sender_email,
+                    'name' => $message->sender_name
+                ],
+                'subject' => "💬 Nouveau message – {$message->listing->title}",
+                'htmlContent' => $htmlContent
+            ]);
+
+            if (!$response->successful()) {
+                Log::error('Email contact API error: ' . $response->body());
+            }
         } catch (\Exception $e) {
             Log::error('Email contact error: ' . $e->getMessage());
         }
@@ -138,14 +167,41 @@ class EmailService
     public function sendMessageReply(Message $originalMessage, string $replyContent, string $adminName): void
     {
         try {
-            Mail::send('emails.message-reply', [
+            $htmlContent = view('emails.message-reply', [
                 'originalMessage' => $originalMessage,
                 'replyContent' => $replyContent,
                 'adminName' => $adminName,
-            ], function ($mail) use ($originalMessage) {
-                $mail->to($originalMessage->sender_email, $originalMessage->sender_name)
-                     ->subject("Re: Votre message concernant \"{$originalMessage->listing->title}\"");
-            });
+            ])->render();
+
+            $apiKey = env('BREVO_API_KEY', config('services.brevo.key'));
+            $senderEmail = env('BREVO_SENDER_EMAIL', config('services.brevo.sender_email', 'noreply@sarouty.com'));
+            $senderNameConfig = env('BREVO_SENDER_NAME', config('services.brevo.sender_name', 'Sarouty'));
+
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'api-key' => $apiKey,
+                'accept' => 'application/json',
+                'content-type' => 'application/json',
+            ])
+            ->withoutVerifying()
+            ->post('https://api.brevo.com/v3/smtp/email', [
+                'sender' => [
+                    'name' => $senderNameConfig,
+                    'email' => $senderEmail
+                ],
+                'to' => [
+                    [
+                        'email' => $originalMessage->sender_email,
+                        'name' => $originalMessage->sender_name
+                    ]
+                ],
+                'subject' => "Re: Votre message concernant \"{$originalMessage->listing->title}\"",
+                'htmlContent' => $htmlContent
+            ]);
+
+            if (!$response->successful()) {
+                Log::error('Email message reply API error: ' . $response->body());
+                throw new \Exception('API Error: ' . $response->body());
+            }
         } catch (\Exception $e) {
             Log::error('Email message reply error: ' . $e->getMessage());
             throw $e;

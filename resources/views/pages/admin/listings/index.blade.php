@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+@php cache()->put('admin_viewed_listings_' . auth()->id(), now()); @endphp
 
 @section('title', 'Gestion des Annonces – Sarouty')
 @section('page_title', 'Gestion des Annonces')

@@ -15,6 +15,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -112,6 +113,9 @@
             background: var(--nav-active-bg);
             color: var(--nav-active-text);
         }
+        .nav-item.active .nav-badge {
+            display: none !important;
+        }
         .nav-icon {
             width: 38px;
             height: 38px;
@@ -167,7 +171,7 @@
     </style>
 </head>
 <body class="h-full bg-[var(--bg)] text-[var(--text)]" x-data="adminLayout()" x-init="init()">
-<div class="admin-shell flex min-h-screen relative w-full overflow-hidden">
+<div class="admin-shell flex h-screen w-full overflow-hidden">
     <template x-if="mobileSidebarOpen">
         <div class="admin-overlay lg:hidden fixed inset-0 bg-slate-900/40 z-30" @click="mobileSidebarOpen = false"></div>
     </template>
@@ -213,6 +217,12 @@
                     </svg>
                 </span>
                 <span>Annonces</span>
+                @php
+                    $pendingListings = \App\Models\Listing::where('status', 'pending')->count();
+                @endphp
+                @if($pendingListings > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $pendingListings }}</span>
+                @endif
             </a>
 
             <a href="{{ route('admin.users.index') }}" class="nav-item nav-ajax {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" data-route-pattern="admin/utilisateurs">
@@ -224,6 +234,13 @@
                     </svg>
                 </span>
                 <span>Utilisateurs</span>
+                @php
+                    $lastViewedUsers = cache('admin_viewed_users_' . auth()->id(), now()->subYears(10));
+                    $newUsersCount = \App\Models\User::where('created_at', '>', $lastViewedUsers)->count();
+                @endphp
+                @if($newUsersCount > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $newUsersCount }}</span>
+                @endif
             </a>
 
             <a href="{{ route('admin.reports.index') }}" class="nav-item nav-ajax {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}" data-route-pattern="admin/signalements">
@@ -234,6 +251,12 @@
                     </svg>
                 </span>
                 <span>Signalements</span>
+                @php
+                    $pendingReports = \App\Models\Report::where('status', 'pending')->count();
+                @endphp
+                @if($pendingReports > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $pendingReports }}</span>
+                @endif
             </a>
 
             <a href="{{ route('admin.messages.index') }}" class="nav-item nav-ajax {{ request()->routeIs('admin.messages.*') ? 'active' : '' }}" data-route-pattern="admin/messages">
@@ -243,6 +266,12 @@
                     </svg>
                 </span>
                 <span>Messages</span>
+                @php
+                    $unreadAdminMessages = \App\Models\Message::where('is_read', false)->whereNull('receiver_id')->count();
+                @endphp
+                @if($unreadAdminMessages > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $unreadAdminMessages }}</span>
+                @endif
             </a>
 
             <a href="{{ route('admin.sponsorships.index') }}" class="nav-item nav-ajax {{ request()->routeIs('admin.sponsorships.*') ? 'active' : '' }}" data-route-pattern="admin/sponsorisations">
@@ -252,6 +281,12 @@
                     </svg>
                 </span>
                 <span>Sponsorisations</span>
+                @php
+                    $pendingSponsors = \App\Models\Sponsorship::where('status', 'pending')->count();
+                @endphp
+                @if($pendingSponsors > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $pendingSponsors }}</span>
+                @endif
             </a>
 
             <a href="{{ route('admin.subscriptions.index') }}" class="nav-item nav-ajax {{ request()->routeIs('admin.subscriptions.*') ? 'active' : '' }}" data-route-pattern="admin/abonnements">
@@ -261,6 +296,14 @@
                     </svg>
                 </span>
                 <span>Abonnements</span>
+                @php
+                    $lastViewedSubs = cache('admin_viewed_subs_' . auth()->id(), now()->subYears(10));
+                    // Check for new payments/subscriptions created since last view
+                    $newSubsCount = \App\Models\Payment::where('created_at', '>', $lastViewedSubs)->count();
+                @endphp
+                @if($newSubsCount > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $newSubsCount }}</span>
+                @endif
             </a>
 
             <a href="{{ route('admin.payments.index') }}" class="nav-item nav-ajax {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}" data-route-pattern="admin/paiements">
@@ -271,6 +314,12 @@
                     </svg>
                 </span>
                 <span>Paiements</span>
+                @php
+                    $pendingPayments = \App\Models\Payment::where('status', 'pending')->count();
+                @endphp
+                @if($pendingPayments > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $pendingPayments }}</span>
+                @endif
             </a>
 
             <a href="{{ route('admin.estimations.index') }}" class="nav-item nav-ajax {{ request()->routeIs('admin.estimations.*') ? 'active' : '' }}" data-route-pattern="admin/estimations">
@@ -280,9 +329,12 @@
                     </svg>
                 </span>
                 <span>Estimations</span>
-                @php $estimCount = \App\Models\Estimation::whereNotNull('contact_email')->count(); @endphp
+                @php
+                    $lastViewedEstimations = cache('admin_viewed_estimations_' . auth()->id(), now()->subYears(10));
+                    $estimCount = \App\Models\Estimation::whereNotNull('contact_email')->where('created_at', '>', $lastViewedEstimations)->count();
+                @endphp
                 @if($estimCount > 0)
-                <span class="ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $estimCount }}</span>
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $estimCount }}</span>
                 @endif
             </a>
 
@@ -328,8 +380,8 @@
         </div>
     </aside>
 
-    <div class="admin-main flex-1 flex flex-col min-h-screen min-w-0 w-full">
-        <header class="admin-topbar">
+    <div class="admin-main flex-1 flex flex-col h-screen overflow-y-auto min-w-0 w-full">
+        <header class="admin-topbar sticky top-0 z-20 bg-[var(--bg)]/90 backdrop-blur-md border-b" style="border-color: var(--border)">
             <div class="px-4 lg:px-8 py-4 flex items-center justify-between gap-3 sm:gap-4">
                 <div class="flex items-center gap-3 min-w-0 flex-1">
                     <button type="button" class="lg:hidden flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl panel"
@@ -341,8 +393,8 @@
                         </svg>
                     </button>
                     <div class="min-w-0">
-                        <h1 class="font-display text-2xl sm:text-3xl font-bold truncate">@yield('page_title', 'Administration')</h1>
-                        <p class="text-xs sm:text-sm truncate" style="color: var(--text-soft)">@yield('page_subtitle', now()->isoFormat('dddd D MMMM YYYY'))</p>
+                        <h1 x-title class="font-display text-2xl sm:text-3xl font-bold truncate">@yield('page_title', 'Administration')</h1>
+                        <p x-subtitle class="text-xs sm:text-sm truncate" style="color: var(--text-soft)">@yield('page_subtitle', now()->isoFormat('dddd D MMMM YYYY'))</p>
                     </div>
                 </div>
 
@@ -480,6 +532,11 @@
                 this.theme = savedTheme || 'light';
                 document.documentElement.classList.toggle('dark', this.theme === 'dark');
                 
+                // Hide badge on the currently active link on initial load
+                setTimeout(() => {
+                    document.querySelectorAll('.nav-ajax.active .nav-badge').forEach(b => b.style.display = 'none');
+                }, 100);
+
                 // Initialize AJAX navigation
                 this.initAjaxNavigation();
             },
@@ -561,6 +618,15 @@
                             }
                         }
                         
+                        // Update topbar subtitle
+                        const newPageSubtitle = doc.querySelector('[x-subtitle]');
+                        if (newPageSubtitle) {
+                            const pageSubtitleEl = document.querySelector('[x-subtitle]');
+                            if (pageSubtitleEl) {
+                                pageSubtitleEl.textContent = newPageSubtitle.textContent;
+                            }
+                        }
+                        
                         // Update active nav state
                         document.querySelectorAll('.nav-ajax').forEach(link => {
                             link.classList.remove('active');
@@ -570,9 +636,13 @@
                                 if (routePattern) {
                                     if (url.includes(routePattern)) {
                                         link.classList.add('active');
+                                        const badge = link.querySelector('.nav-badge');
+                                        if (badge) badge.style.display = 'none';
                                     }
                                 } else if (href && url.includes(href)) {
                                     link.classList.add('active');
+                                    const badge = link.querySelector('.nav-badge');
+                                    if (badge) badge.style.display = 'none';
                                 }
                             }
                         });

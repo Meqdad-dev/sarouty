@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+@php cache()->put('admin_viewed_subs_' . auth()->id(), now()); @endphp
 
 @section('title', 'Abonnements – Sarouty')
 @section('page_title', 'Abonnements')

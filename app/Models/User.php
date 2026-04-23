@@ -373,4 +373,16 @@ class User extends Authenticatable
             'max_images_per_ad' => $freeImages,
         ]);
     }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
 }
+

@@ -4,14 +4,7 @@
 @section('page_title', 'Dashboard')
 @section('page_subtitle', 'Vue globale de la plateforme et activité récente')
 
-@section('top_actions')
-    <a href="{{ route('admin.messages.index') }}" class="inline-flex items-center gap-2 rounded-xl panel px-4 py-2 text-sm font-medium hover:border-gold/40 transition">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path>
-        </svg>
-        Messages
-    </a>
-@endsection
+
 
 @section('content')
     {{-- Main Statistics Grid --}}

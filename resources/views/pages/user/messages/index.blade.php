@@ -1,4 +1,5 @@
 @extends('layouts.user')
+@php cache()->put('user_viewed_messages_' . auth()->id(), now()); @endphp
 
 @section('title', 'Mes Messages – Mon Espace')
 @section('page_title', 'Mes Messages')

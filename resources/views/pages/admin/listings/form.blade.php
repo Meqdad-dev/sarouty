@@ -331,10 +331,23 @@
                     @if($listing->exists && $listing->images->isNotEmpty())
                         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                             @foreach($listing->images as $img)
-                                <div class="relative aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 group">
+                                <div x-data="{ deleted: false }" x-show="!deleted" class="relative aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 group">
                                     <img src="{{ $img->url }}" class="w-full h-full object-cover">
-                                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <span class="text-white text-xs font-medium">Connecté</span>
+                                    
+                                    {{-- Bouton de suppression --}}
+                                    <button type="button" @click="deleted = true" 
+                                            class="absolute top-2 right-2 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 shadow-md transition-all transform hover:scale-110 z-10 opacity-0 group-hover:opacity-100">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    </button>
+
+                                    {{-- Input caché --}}
+                                    <template x-if="deleted">
+                                        <input type="hidden" name="delete_images[]" value="{{ $img->id }}">
+                                    </template>
+
+                                    <div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity pointer-events-none">
+                                        <span class="text-white text-xs font-medium">Photo {{ $loop->index + 1 }}</span>
+                                        <span class="text-white/80 text-[10px] mt-1">Cliquer sur × pour supprimer</span>
                                     </div>
                                 </div>
                             @endforeach

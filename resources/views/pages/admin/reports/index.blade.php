@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+@php cache()->put('admin_viewed_reports_' . auth()->id(), now()); @endphp
 
 @section('title', 'Gestion des Signalements – Sarouty')
 @section('page_title', 'Gestion des Signalements')

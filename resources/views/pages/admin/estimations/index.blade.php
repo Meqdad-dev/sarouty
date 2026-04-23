@@ -1,6 +1,8 @@
 @extends('layouts.admin')
 @section('title', 'Estimations – Sarouty Admin')
-
+@php cache()->put('admin_viewed_estimations_' . auth()->id(), now()); @endphp
+@section('page_title', 'Estimations')
+@section('page_subtitle', 'Demandes reçues depuis le formulaire d\'estimation du site')
 @section('content')
 <div class="p-6 lg:p-8 space-y-6">
 

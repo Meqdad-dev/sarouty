@@ -1,4 +1,5 @@
 @extends('layouts.user')
+@php cache()->put('user_viewed_notifications_' . auth()->id(), now()); @endphp
 
 @section('title', 'Notifications – Mon Espace')
 @section('page_title', 'Mes notifications')

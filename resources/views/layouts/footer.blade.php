@@ -35,6 +35,15 @@
                             </a>
                         </li>
                     @endforeach
+                    <li class="pt-1">
+                        <a href="{{ route('listings.index') }}"
+                           class="inline-flex items-center gap-1.5 text-sm text-gold hover:text-white font-semibold transition-colors group">
+                            Autres villes
+                            <svg class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            </svg>
+                        </a>
+                    </li>
                 </ul>
             </div>
 
@@ -84,12 +93,8 @@
         </div>
 
         <div class="border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p class="text-xs text-white/40 flex items-center gap-1.5">
-                © {{ date('Y') }} Sarouty. Tous droits réservés. Fait avec 
-                <svg class="w-3.5 h-3.5 text-red-500 fill-current" viewBox="0 0 20 20">
-                    <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
-                </svg>
-                au Maroc.
+            <p class="text-xs text-white/40 flex items-center gap-1.5 flex-wrap">
+                © {{ date('Y') }} Sarouty. Tous droits réservés. Développé par <span class="text-gold font-semibold">Devcompany</span>
             </p>
             <div class="flex gap-4">
                 <a href="#" class="text-xs text-white/40 hover:text-gold transition-colors">CGU</a>

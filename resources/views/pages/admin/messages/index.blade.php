@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+@php cache()->put('admin_viewed_messages_' . auth()->id(), now()); @endphp
 
 @section('title', 'Gestion des Messages – Sarouty')
 @section('page_title', 'Gestion des Messages')
