@@ -7,7 +7,7 @@
 {{-- ═══════════════════════════════════════════════════════════════
      HERO SECTION
 ═══════════════════════════════════════════════════════════════ --}}
-<section class="relative min-h-screen flex items-center pt-16 overflow-hidden">
+<section class="relative min-h-[100svh] sm:min-h-screen flex items-center pt-16 overflow-hidden">
 
     {{-- Arrière-plan vidéo --}}
     <video id="heroVideo" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover">
@@ -26,20 +26,20 @@
 
 
 
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
         <div class="text-center mb-12">
             <div class="inline-flex items-center gap-2 bg-gold/20 border border-gold/40 rounded-full px-4 py-1.5 mb-6">
                 <span class="w-2 h-2 bg-gold rounded-full animate-pulse"></span>
                 <span class="text-gold text-sm font-medium">{{ number_format($stats['total']) }} annonces actives</span>
             </div>
 
-            <h1 class="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6">
+            <h1 class="font-display text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6">
                 Trouvez votre<br>
                 <span class="text-gold italic">bien idéal</span><br>
                 au Maroc
             </h1>
 
-            <p class="text-white/60 text-lg max-w-2xl mx-auto mb-12">
+            <p class="text-white/70 text-base sm:text-lg max-w-2xl mx-auto mb-10 sm:mb-12">
                 Des milliers d'appartements, villas, riads et terrains à vendre ou à louer dans toutes les villes du Maroc.
             </p>
 
@@ -47,11 +47,11 @@
             <form action="{{ route('listings.index') }}" method="GET" class="max-w-4xl mx-auto">
                 <div class="bg-white rounded-2xl p-2 shadow-2xl">
                     {{-- Tabs type de transaction --}}
-                    <div class="flex gap-1 mb-3 px-2 pt-2">
+                    <div class="flex flex-wrap gap-2 mb-3 px-2 pt-2 tab-group">
                         @foreach(['vente' => 'Acheter', 'location' => 'Louer', 'neuf' => 'Neuf', 'vacances' => 'Vacances'] as $value => $label)
                             <button type="button"
                                     onclick="document.getElementById('tab-type').value='{{ $value }}'; this.closest('.tab-group').querySelectorAll('button').forEach(b => b.classList.remove('bg-gold','text-white')); this.classList.add('bg-gold','text-white')"
-                                    class="tab-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all {{ $value === 'vente' ? 'bg-gold text-white' : 'text-ink/60 hover:text-ink' }}"
+                                    class="tab-btn inline-flex flex-1 sm:flex-none items-center justify-center px-4 py-2 rounded-lg text-sm font-medium transition-all {{ $value === 'vente' ? 'bg-gold text-white' : 'text-ink/60 hover:text-ink' }}"
                                     data-tab-group="transaction">
                                 {{ $label }}
                             </button>
@@ -59,7 +59,7 @@
                         <input type="hidden" name="type" id="tab-type" value="vente">
                     </div>
 
-                    <div class="flex flex-col sm:flex-row gap-2 px-2 pb-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 px-2 pb-2">
                         {{-- Ville --}}
                         <div class="flex-1 relative">
                             <div class="absolute left-3 top-1/2 -translate-y-1/2 text-ink/40">
@@ -103,7 +103,7 @@
                         </div>
 
                         <button type="submit"
-                                class="bg-gold hover:bg-gold-dark text-white font-semibold px-8 py-3 rounded-xl transition-colors flex items-center gap-2 whitespace-nowrap">
+                                class="bg-gold hover:bg-gold-dark text-white font-semibold px-6 py-3 rounded-xl transition-colors flex items-center justify-center gap-2 whitespace-nowrap w-full xl:w-auto">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
@@ -115,7 +115,7 @@
         </div>
 
         {{-- Stats rapides --}}
-        <div class="flex flex-wrap justify-center gap-8 mt-16">
+        <div class="flex flex-wrap justify-center gap-6 sm:gap-8 mt-12 sm:mt-16">
             @foreach([
                 ['label' => 'Biens à vendre', 'value' => number_format($stats['vente']), 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>'],
                 ['label' => 'En location', 'value' => number_format($stats['location']), 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />'],
@@ -142,9 +142,9 @@
 <section class="py-20 relative overflow-hidden" style="background: linear-gradient(135deg, #1A1410 0%, #2D1F12 50%, #1A2810 100%);">
     {{-- Background décor --}}
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-10" style="background: radial-gradient(circle, #C8963E, transparent);"></div>
-        <div class="absolute -bottom-24 -left-24 w-80 h-80 rounded-full opacity-10" style="background: radial-gradient(circle, #C8963E, transparent);"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-5 border border-gold"></div>
+        <div class="absolute -top-24 -right-24 w-72 h-72 sm:w-96 sm:h-96 rounded-full opacity-10" style="background: radial-gradient(circle, #C8963E, transparent);"></div>
+        <div class="absolute -bottom-24 -left-24 w-64 h-64 sm:w-80 sm:h-80 rounded-full opacity-10" style="background: radial-gradient(circle, #C8963E, transparent);"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] sm:w-[480px] sm:h-[480px] lg:w-[600px] lg:h-[600px] rounded-full opacity-5 border border-gold"></div>
     </div>
 
     <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -211,7 +211,7 @@
                         <div class="font-display text-4xl font-bold text-gold mb-1">1 080 000 – 1 350 000</div>
                         <div class="text-white/50 text-sm">MAD</div>
                     </div>
-                    <div class="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/10">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/10">
                         @foreach(['Prix min' => '1 080 000', 'Estimé' => '1 215 000', 'Prix max' => '1 350 000'] as $label => $val)
                         <div class="text-center">
                             <div class="text-white/40 text-xs mb-1">{{ $label }}</div>
@@ -221,7 +221,7 @@
                     </div>
                 </div>
                 {{-- Stats --}}
-                <div class="grid grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     @foreach([
                         ['val' => '50K+', 'lbl' => 'Transactions analysées'],
                         ['val' => '20', 'lbl' => 'Villes couvertes'],
@@ -244,7 +244,7 @@
 @if($featuredListings->isNotEmpty())
 <section class="py-20 bg-sand-light">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-end justify-between mb-12">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-12">
             <div>
                 <p class="text-gold text-sm font-medium uppercase tracking-widest mb-2">Sélection exclusive</p>
                 <h2 class="font-display text-4xl font-bold text-ink">Coups de cœur</h2>
@@ -434,7 +434,7 @@
             <div id="estim-step-2" class="estim-step hidden">
                 <h4 class="font-bold text-gray-900 text-lg mb-1">Type d'opération</h4>
                 <p class="text-gray-500 text-sm mb-5">Vente, location ou autre ?</p>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     @foreach([
                         ['vente','Vente','M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z','Achat / Investissement'],
                         ['location','Location longue durée','M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z','Appartement, villa...'],
@@ -487,7 +487,7 @@
                         <div id="estim-surface-label" class="text-center text-gold font-semibold text-sm mt-1">100 m²</div>
                     </div>
                     {{-- Grille chambres / SDB / étage --}}
-                    <div id="rooms-fields-wrap" class="grid grid-cols-3 gap-3">
+                    <div id="rooms-fields-wrap" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         {{-- Chambres --}}
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 mb-1.5">Chambres</label>
@@ -665,7 +665,7 @@
                         <div id="estim-price-mid" class="font-display text-4xl font-bold text-gold mb-1">—</div>
                         <div class="text-white/40 text-sm">MAD</div>
                         <div id="estim-result-desc" class="text-white/40 text-sm mt-3"></div>
-                        <div class="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/10">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/10">
                             <div><div class="text-white/40 text-xs mb-1">Estimation basse</div><div id="estim-price-min" class="text-white font-semibold text-sm">—</div></div>
                             <div class="border-x border-white/10"><div class="text-white/40 text-xs mb-1">Prix au m²</div><div id="estim-price-sqm" class="text-gold font-semibold text-sm">—</div></div>
                             <div><div class="text-white/40 text-xs mb-1">Estimation haute</div><div id="estim-price-max" class="text-white font-semibold text-sm">—</div></div>
@@ -690,7 +690,7 @@
         </div>{{-- fin overflow --}}
 
         {{-- ── Footer navigation ── --}}
-        <div id="estim-nav" class="flex items-center px-6 pb-5 pt-2 flex-shrink-0 border-t border-gray-100">
+        <div id="estim-nav" class="flex flex-col gap-3 sm:flex-row sm:items-center px-6 pb-5 pt-2 flex-shrink-0 border-t border-gray-100">
             <button id="estim-prev" onclick="estimPrev()" class="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 Retour
@@ -712,7 +712,7 @@
 ═══════════════════════════════════════════════════════════════ --}}
 <section class="py-20 bg-sand">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-end justify-between mb-12">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-12">
             <div>
                 <p class="text-gold text-sm font-medium uppercase tracking-widest mb-2">Dernières parutions</p>
                 <h2 class="font-display text-4xl font-bold text-ink">Annonces récentes</h2>

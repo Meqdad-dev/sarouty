@@ -51,7 +51,7 @@
     ];
 @endphp
 
-<div class="space-y-5 xl:sticky xl:top-24">
+<div class="space-y-5 lg:sticky lg:top-24 self-start">
     <div class="rounded-[28px] border border-white/70 bg-white/95 shadow-[0_25px_60px_-30px_rgba(26,20,16,0.35)] backdrop-blur">
         <div class="border-b border-stone-100 px-6 py-6">
             <div class="flex items-center gap-4">

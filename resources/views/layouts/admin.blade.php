@@ -68,12 +68,18 @@
         }
 
         .font-display { font-family: 'Cormorant Garamond', serif; }
-        .admin-shell { min-height: 100vh; display: flex; }
+        .admin-shell { min-height: 100vh; display: flex; align-items: flex-start; }
         .admin-sidebar {
             width: 280px;
+            position: sticky;
+            top: 0;
+            align-self: flex-start;
+            height: 100vh;
+            max-height: 100vh;
             background: var(--sidebar);
             border-right: 1px solid var(--border);
             box-shadow: var(--shadow);
+            overscroll-behavior: contain;
         }
         .admin-main { flex: 1; min-width: 0; }
         .admin-topbar {
@@ -142,6 +148,56 @@
         .badge-danger  { background: rgba(239,68,68,.12); color: #dc2626; }
         .badge-info    { background: rgba(59,130,246,.12); color: #2563eb; }
 
+        #admin-top-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        #admin-top-actions a,
+        #admin-top-actions button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 44px;
+            padding: 0.72rem 1rem;
+            border-radius: 16px;
+            border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+            background: linear-gradient(135deg, rgba(200,150,62,0.14), rgba(255,255,255,0.96));
+            color: var(--text);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+            text-decoration: none;
+            font-size: 0.92rem;
+            font-weight: 600;
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease, color .2s ease;
+        }
+        html.dark #admin-top-actions a,
+        html.dark #admin-top-actions button {
+            background: linear-gradient(135deg, rgba(200,150,62,0.22), rgba(22,26,35,0.96));
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+        }
+        #admin-top-actions a:hover,
+        #admin-top-actions button:hover {
+            transform: translateY(-1px);
+            border-color: rgba(200,150,62,0.45);
+            color: var(--nav-active-text);
+            box-shadow: 0 16px 34px rgba(200,150,62,0.18);
+        }
+        #admin-main-content :is(a, button)[class*="w-8"][class*="h-8"][class*="rounded-lg"][class*="border"] {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.95rem;
+            background: color-mix(in srgb, var(--panel-soft) 88%, transparent);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease, color .2s ease;
+        }
+        #admin-main-content :is(a, button)[class*="w-8"][class*="h-8"][class*="rounded-lg"][class*="border"]:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+        }
+
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-thumb { background: rgba(148,163,184,.45); border-radius: 999px; }
 
@@ -152,9 +208,13 @@
                 bottom: 0;
                 left: 0;
                 height: 100vh;
+                max-height: 100vh;
                 z-index: 40;
                 transform: translateX(-100%);
                 transition: transform .25s ease;
+            }
+            #admin-top-actions {
+                justify-content: flex-start;
             }
             .admin-sidebar.open { transform: translateX(0); }
             .admin-overlay {
@@ -406,7 +466,7 @@
                 </div>
 
                 <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                    <div id="admin-top-actions">@yield('top_actions')</div>
+                    <div id="admin-top-actions" class="w-full sm:w-auto">@yield('top_actions')</div>
                     
                     {{-- Chrono (Horloge en temps réel) --}}
                     <div class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl panel text-sm font-medium transition duration-300" 

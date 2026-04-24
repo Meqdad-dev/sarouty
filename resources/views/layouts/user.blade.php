@@ -68,12 +68,18 @@
         }
 
         .font-display { font-family: 'Cormorant Garamond', serif; }
-        .admin-shell { min-height: 100vh; display: flex; }
+        .admin-shell { min-height: 100vh; display: flex; align-items: flex-start; }
         .admin-sidebar {
             width: 280px;
+            position: sticky;
+            top: 0;
+            align-self: flex-start;
+            height: 100vh;
+            max-height: 100vh;
             background: var(--sidebar);
             border-right: 1px solid var(--border);
             box-shadow: var(--shadow);
+            overscroll-behavior: contain;
         }
         .admin-main { flex: 1; min-width: 0; }
         .admin-topbar {
@@ -138,6 +144,7 @@
                 bottom: 0;
                 left: 0;
                 height: 100vh;
+                max-height: 100vh;
                 z-index: 40;
                 transform: translateX(-100%);
                 transition: transform .25s ease;
