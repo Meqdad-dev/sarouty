@@ -2,17 +2,17 @@
     Composant carte d'annonce réutilisable
     Usage : @include('components.listing-card', ['listing' => $listing])
 --}}
-<article class="listing-card group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-sand/60">
+<article class="listing-card group h-full bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-sand/60">
 
     {{-- Image --}}
-    <a href="{{ route('listings.show', $listing) }}" class="block relative overflow-hidden h-52">
+    <a href="{{ route('listings.show', $listing) }}" class="block relative overflow-hidden h-48 sm:h-52">
         <img src="{{ $listing->thumbnail_url }}"
              alt="{{ $listing->title }}"
              class="listing-img w-full h-full object-cover"
              loading="lazy">
 
         {{-- Badges --}}
-        <div class="absolute top-3 left-3 flex gap-2 flex-wrap">
+        <div class="absolute top-3 left-3 flex max-w-[calc(100%-4.5rem)] gap-2 flex-wrap">
             <span class="bg-gold text-white text-xs font-semibold px-2.5 py-1 rounded-full">
                 {{ $listing->transaction_label }}
             </span>
@@ -47,7 +47,7 @@
 
     {{-- Contenu --}}
     <div class="p-4">
-        <div class="flex items-baseline justify-between mb-2">
+        <div class="mb-2 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
             <span class="font-display text-2xl font-bold text-ink">{{ $listing->formatted_price }}</span>
             @if($listing->surface && $listing->property_type === 'terrain')
                 <span class="text-xs text-ink/40 font-medium">
@@ -72,7 +72,7 @@
         </p>
 
         {{-- Caractéristiques --}}
-        <div class="flex items-center gap-3 text-xs text-ink/60 border-t border-sand pt-3">
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-ink/60 border-t border-sand pt-3">
             @if($listing->surface)
                 <span class="flex items-center gap-1">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,7 +97,7 @@
                     {{ $listing->bathrooms }}
                 </span>
             @endif
-            <span class="ml-auto flex items-center gap-0.5 text-ink/30">
+            <span class="flex w-full items-center gap-0.5 text-ink/30 sm:ml-auto sm:w-auto sm:justify-end">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>

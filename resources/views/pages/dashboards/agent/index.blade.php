@@ -5,7 +5,7 @@
 @section('page_subtitle', 'Gérez vos annonces et visualisez vos statistiques')
 
 @section('top_actions')
-    <a href="{{ route('user.favorites') }}" class="inline-flex items-center gap-2 rounded-xl panel px-4 py-2 text-sm font-medium hover:border-gold/40 transition">
+    <a href="{{ route('user.favorites') }}" class="topbar-btn inline-flex items-center justify-center gap-2 rounded-xl panel px-4 py-2 text-sm font-medium hover:border-gold/40 transition w-full sm:w-auto">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
         </svg>
@@ -14,7 +14,7 @@
 @endsection
 
 @section('content')
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="dashboard-metric-grid mb-6">
         @foreach([
             ['label' => 'Annonces actives', 'value' => $stats['listings_active'], 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', 'bg' => 'from-emerald-500 to-emerald-600'],
             ['label' => 'En attente',       'value' => $stats['listings_pending'], 'icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', 'bg' => 'from-amber-500 to-amber-600'],
@@ -41,11 +41,11 @@
     </div>
 
 
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div class="dashboard-content-grid">
         {{-- My Listings or Favorites --}}
-        <div class="xl:col-span-2 space-y-6">
+        <div class="dashboard-main-column space-y-6">
             <div class="panel rounded-2xl overflow-hidden">
-                <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/30">
+                <div class="dashboard-panel-header px-6 py-5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                             <svg class="w-5 h-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,7 +57,7 @@
                 </div>
 
                 <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-white/70 dark:bg-gray-900/10">
-                    <div class="flex flex-wrap items-center gap-3">
+                    <div class="dashboard-panel-actions">
                         <a href="{{ route('user.listings.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-gold px-4 py-2 text-sm font-semibold text-white transition hover:bg-gold-dark">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             Publier une annonce
@@ -145,7 +145,7 @@
                                 </div>
 
                                 {{-- Actions --}}
-                                <div class="dashboard-list-actions lg:opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div class="dashboard-list-actions">
                                     <a href="{{ route('user.listings.show', $listing) }}"
                                        class="action-icon-btn action-icon-btn--neutral" title="Voir">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,7 +191,7 @@
         </div>
 
         {{-- Right Sidebar Content --}}
-        <div>
+        <div class="dashboard-side-column space-y-6">
             {{-- Quota Section --}}
             @php
                 $quota   = auth()->user()->plan_quota;
@@ -238,7 +238,7 @@
             </div>
 
             {{-- Quick action card --}}
-            <a href="{{ route('user.profile') }}" class="mt-6 panel-soft rounded-2xl p-6 flex flex-col items-center justify-center text-center group hover:border-gold/30 hover:shadow-md transition-all">
+            <a href="{{ route('user.profile') }}" class="panel-soft rounded-2xl p-6 flex flex-col items-center justify-center text-center group hover:border-gold/30 hover:shadow-md transition-all">
                 <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 mb-3 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -256,7 +256,7 @@
                     ->get();
             @endphp
             @if($sponsoredListings->isNotEmpty())
-                <div class="mt-6 panel rounded-2xl p-6">
+                <div class="panel rounded-2xl p-6">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                             <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>

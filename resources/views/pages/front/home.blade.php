@@ -33,19 +33,30 @@
                 <span class="text-gold text-sm font-medium">{{ number_format($stats['total']) }} annonces actives</span>
             </div>
 
-            <h1 class="font-display text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6">
+            <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight mb-6">
                 Trouvez votre<br>
                 <span class="text-gold italic">bien idéal</span><br>
                 au Maroc
             </h1>
 
-            <p class="text-white/70 text-base sm:text-lg max-w-2xl mx-auto mb-10 sm:mb-12">
+            <p class="text-white/70 text-base sm:text-lg max-w-2xl mx-auto mb-8 sm:mb-10">
                 Des milliers d'appartements, villas, riads et terrains à vendre ou à louer dans toutes les villes du Maroc.
             </p>
 
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 mb-10 sm:mb-12">
+                <a href="{{ route('listings.index') }}"
+                   class="inline-flex items-center justify-center gap-2 rounded-xl bg-gold px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-gold/20 transition hover:bg-gold-dark">
+                    Explorer les annonces
+                </a>
+                <a href="{{ route('tarifs') }}"
+                   class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:border-gold hover:text-gold">
+                    Voir les tarifs
+                </a>
+            </div>
+
             {{-- Barre de recherche principale --}}
             <form action="{{ route('listings.index') }}" method="GET" class="max-w-4xl mx-auto">
-                <div class="bg-white rounded-2xl p-2 shadow-2xl">
+                <div class="rounded-[1.75rem] border border-white/20 bg-white/95 p-2 shadow-2xl backdrop-blur-sm sm:p-3">
                     {{-- Tabs type de transaction --}}
                     <div class="flex flex-wrap gap-2 mb-3 px-2 pt-2 tab-group">
                         @foreach(['vente' => 'Acheter', 'location' => 'Louer', 'neuf' => 'Neuf', 'vacances' => 'Vacances'] as $value => $label)
@@ -103,7 +114,7 @@
                         </div>
 
                         <button type="submit"
-                                class="bg-gold hover:bg-gold-dark text-white font-semibold px-6 py-3 rounded-xl transition-colors flex items-center justify-center gap-2 whitespace-nowrap w-full xl:w-auto">
+                                class="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-dark xl:w-auto">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
@@ -187,7 +198,7 @@
 
                 <button id="openEstimationModal"
                         onclick="document.getElementById('estimation-modal').classList.remove('hidden'); document.getElementById('estimation-modal').classList.add('flex');"
-                        class="group inline-flex items-center gap-3 bg-gold hover:bg-gold-dark text-white font-bold text-lg px-10 py-4 rounded-2xl transition-all duration-300 shadow-2xl shadow-gold/30 hover:shadow-gold/50 hover:-translate-y-0.5">
+                        class="group inline-flex w-full sm:w-auto items-center justify-center gap-3 rounded-2xl bg-gold px-6 sm:px-10 py-4 text-base sm:text-lg font-bold text-white transition-all duration-300 shadow-2xl shadow-gold/30 hover:-translate-y-0.5 hover:bg-gold-dark hover:shadow-gold/50">
                     <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                     </svg>
@@ -340,7 +351,7 @@
                 ['city' => 'Agadir', 'img' => "images/cities/agadir.jpg", 'fallback' => 'https://images.unsplash.com/photo-1616892523533-5c02dc21cc99?auto=format&fit=crop&w=800&q=80', 'desc' => 'Capitale du Souss'],
                 ['city' => 'Fès', 'img' => "images/cities/fes.jpg", 'fallback' => 'https://images.unsplash.com/photo-1555581122-eb168bb1d8fc?auto=format&fit=crop&w=800&q=80', 'desc' => 'Capitale spirituelle'],
             ] as $dest)
-                <a href="{{ route('listings.index', ['city' => $dest['city']]) }}" class="group relative h-80 rounded-2xl overflow-hidden block shadow-lg hover:shadow-2xl transition-shadow">
+                <a href="{{ route('listings.index', ['city' => $dest['city']]) }}" class="group relative block h-72 sm:h-80 overflow-hidden rounded-2xl shadow-lg transition-shadow hover:shadow-2xl">
                     <img src="{{ asset($dest['img']) }}" onerror="this.onerror=null; this.src='{{ $dest['fallback'] }}';" alt="{{ $dest['city'] }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
                     <div class="absolute bottom-0 left-0 right-0 p-6 text-left">
@@ -376,7 +387,7 @@
 {{-- ═══════════════════════════════════════════════════════════════
      MODAL ESTIMATION (6 étapes)
 ═══════════════════════════════════════════════════════════════ --}}
-<div id="estimation-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-6" style="background:rgba(0,0,0,0.80);backdrop-filter:blur(6px);">
+<div id="estimation-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-2 sm:p-6" style="background:rgba(0,0,0,0.80);backdrop-filter:blur(6px);">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-xl relative flex flex-col" style="max-height:92vh;">
 
         {{-- ── Header fixe ── --}}

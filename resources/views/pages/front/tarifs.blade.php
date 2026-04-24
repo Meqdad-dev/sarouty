@@ -66,6 +66,32 @@
     .faq-item {
         border-bottom: 1px solid #EDE5DA;
     }
+    .pricing-toggle {
+        width: min(100%, 24rem);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .comparison-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    @media (max-width: 767px) {
+        .plan-card:hover,
+        .plan-card.recommended,
+        .plan-card.recommended:hover {
+            transform: none;
+        }
+        .tab-pill {
+            flex: 1 1 calc(50% - 0.25rem);
+            text-align: center;
+            padding: 0.7rem 1rem;
+        }
+        .comparison-table-wrap table {
+            min-width: 46rem;
+        }
+    }
 </style>
 @endpush
 
@@ -73,13 +99,13 @@
 <div class="pt-20 min-h-screen" style="background:#F8F3EE" x-data="{ billing: 'mensuel' }">
 
     {{-- ─── Hero ──────────────────────────────────────────────────────── --}}
-    <div class="hero-gradient py-16 text-center relative overflow-hidden">
+    <div class="hero-gradient relative overflow-hidden py-14 sm:py-16 text-center">
         {{-- Decorative pattern --}}
         <div class="absolute inset-0 opacity-5" style="background-image:url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C8963E' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"></div>
 
         <div class="relative max-w-3xl mx-auto px-4">
             <p class="text-gold text-xs font-semibold uppercase tracking-widest mb-4">Tarification</p>
-            <h1 class="font-display text-5xl font-bold text-white mb-4 leading-tight">
+            <h1 class="font-display text-4xl sm:text-5xl font-bold text-white mb-4 leading-tight">
                 Publiez. Vendez. Réussissez.
             </h1>
             <p class="text-white/60 text-base max-w-xl mx-auto leading-relaxed">
@@ -88,7 +114,7 @@
             </p>
 
             {{-- Toggle annuel/mensuel --}}
-            <div class="mt-8 inline-flex items-center gap-1 bg-white/10 rounded-full p-1">
+            <div class="pricing-toggle mt-8 inline-flex items-center gap-1 rounded-full bg-white/10 p-1">
                 <button class="tab-pill" :class="billing === 'mensuel' ? 'active' : ''" @click="billing = 'mensuel'">Mensuel</button>
                 <button class="tab-pill" :class="billing === 'annuel' ? 'active' : ''" @click="billing = 'annuel'">
                     Annuel
@@ -99,7 +125,7 @@
     </div>
 
     {{-- ─── Plans ─────────────────────────────────────────────────────── --}}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 pb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 pb-16 overflow-hidden">
 
         @php
             $userRole = auth()->check() ? auth()->user()->role : null;
@@ -264,7 +290,7 @@
         </div>
 
         {{-- ─── Garanties ──────────────────────────────────────────────── --}}
-        <div class="mt-12 bg-white rounded-2xl border border-sand-dark p-8">
+        <div class="mt-12 rounded-2xl border border-sand-dark bg-white p-6 sm:p-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
                 <div class="flex flex-col items-center gap-3">
                     <div class="p-3 bg-green-50 rounded-xl">
@@ -307,48 +333,92 @@
             <h2 class="font-display text-3xl font-bold text-ink text-center mb-2">Comparaison détaillée</h2>
             <p class="text-gray-400 text-sm text-center mb-10">Toutes les fonctionnalités en un coup d'oeil</p>
 
-            <div class="bg-white rounded-2xl border border-sand-dark overflow-hidden shadow-sm">
+            @php
+                $rows = [
+                    ['label' => 'Annonces / mois (particulier)',  'vals' => ['2', '10', '20', 'Illimit.']],
+                    ['label' => 'Annonces / mois (agent)',        'vals' => ['5', '15', '30', 'Illimit.']],
+                    ['label' => 'Photos par annonce',             'vals' => ['5', '15', '20', 'Illimitees']],
+                    ['label' => 'Duree de visibilite',            'vals' => ['30 jours', '60 jours', '90 jours', '120 jours']],
+                    ['label' => 'Niveau de priorite',             'vals' => ['0', '2', '5', '8']],
+                    ['label' => 'Mise en avant',                  'vals' => [false, true, true, true]],
+                    ['label' => 'Badge verifie',                  'vals' => [false, false, true, true]],
+                    ['label' => 'Statistiques',                   'vals' => ['Basiques', 'Detaillees', 'Avancees', 'Completes']],
+                    ['label' => 'Support',                        'vals' => ['Email', 'Prioritaire', 'Telephone', 'Account manager']],
+                    ['label' => 'Export CSV',                     'vals' => [false, false, false, true]],
+                    ['label' => 'Acces API',                      'vals' => [false, false, false, true]],
+                ];
+                $comparisonPlans = [
+                    ['name' => 'Gratuit', 'index' => 0, 'accent' => 'text-gray-800 border-gray-200'],
+                    ['name' => 'Starter', 'index' => 1, 'accent' => 'text-gold border-gold/30 bg-gold/5'],
+                    ['name' => 'Pro', 'index' => 2, 'accent' => 'text-ink border-ink/10'],
+                    ['name' => 'Agence', 'index' => 3, 'accent' => 'text-terracotta border-terracotta/20'],
+                ];
+            @endphp
+
+            <div class="grid grid-cols-1 gap-4 md:hidden">
+                @foreach($comparisonPlans as $planCard)
+                    <div class="rounded-2xl border p-4 shadow-sm {{ $planCard['accent'] }}">
+                        <h3 class="font-display text-2xl font-bold {{ str_contains($planCard['accent'], 'text-gold') ? 'text-gold' : (str_contains($planCard['accent'], 'text-terracotta') ? 'text-terracotta' : 'text-ink') }}">
+                            {{ $planCard['name'] }}
+                        </h3>
+                        <div class="mt-4 space-y-3">
+                            @foreach($rows as $row)
+                                @php $val = $row['vals'][$planCard['index']]; @endphp
+                                <div class="rounded-xl bg-white/80 px-3 py-3">
+                                    <div class="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">{{ $row['label'] }}</div>
+                                    <div class="mt-2 text-sm font-medium text-gray-700">
+                                        @if($val === true)
+                                            <span class="inline-flex items-center gap-2 text-gold">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                                </svg>
+                                                Inclus
+                                            </span>
+                                        @elseif($val === false)
+                                            <span class="inline-flex items-center gap-2 text-gray-400">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                                </svg>
+                                                Non inclus
+                                            </span>
+                                        @else
+                                            {{ $val }}
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="comparison-table-wrap hidden overflow-hidden rounded-2xl border border-sand-dark bg-white shadow-sm md:block">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-sand-dark">
-                            <th class="text-left p-5 font-medium text-gray-500 w-1/3">Fonctionnalité</th>
+                            <th class="w-1/3 p-5 text-left font-medium text-gray-500">Fonctionnalité</th>
                             <th class="p-5 text-center font-bold text-gray-800">Gratuit</th>
-                            <th class="p-5 text-center font-bold text-gold bg-gold/5">Starter</th>
+                            <th class="bg-gold/5 p-5 text-center font-bold text-gold">Starter</th>
                             <th class="p-5 text-center font-bold text-ink">Pro</th>
                             <th class="p-5 text-center font-bold text-terracotta">Agence</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @php
-                            $rows = [
-                                ['label' => 'Annonces / mois (particulier)',  'vals' => ['2', '10', '20', 'Illimit.']],
-                                ['label' => 'Annonces / mois (agent)',        'vals' => ['5', '15', '30', 'Illimit.']],
-                                ['label' => 'Photos par annonce',             'vals' => ['5', '15', '20', 'Illimitees']],
-                                ['label' => 'Duree de visibilite',            'vals' => ['30 jours', '60 jours', '90 jours', '120 jours']],
-                                ['label' => 'Niveau de priorite',             'vals' => ['0', '2', '5', '8']],
-                                ['label' => 'Mise en avant',                  'vals' => [false, true, true, true]],
-                                ['label' => 'Badge verifie',                  'vals' => [false, false, true, true]],
-                                ['label' => 'Statistiques',                   'vals' => ['Basiques', 'Detaillees', 'Avancees', 'Completes']],
-                                ['label' => 'Support',                        'vals' => ['Email', 'Prioritaire', 'Telephone', 'Account manager']],
-                                ['label' => 'Export CSV',                     'vals' => [false, false, false, true]],
-                                ['label' => 'Acces API',                      'vals' => [false, false, false, true]],
-                            ];
-                        @endphp
                         @foreach($rows as $row)
                             <tr class="comparison-row border-b border-sand-dark last:border-0">
                                 <td class="p-5 font-medium text-gray-700">{{ $row['label'] }}</td>
                                 @foreach($row['vals'] as $val)
                                     <td class="p-5 text-center {{ $loop->index === 1 ? 'bg-gold/5' : '' }}">
                                         @if($val === true)
-                                            <svg class="w-5 h-5 text-gold mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="mx-auto h-5 w-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                                             </svg>
                                         @elseif($val === false)
-                                            <svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="mx-auto h-4 w-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                             </svg>
                                         @else
-                                            <span class="text-gray-700 font-medium">{{ $val }}</span>
+                                            <span class="font-medium text-gray-700">{{ $val }}</span>
                                         @endif
                                     </td>
                                 @endforeach
@@ -418,7 +488,7 @@
         </div>
 
         {{-- ─── CTA final ──────────────────────────────────────────────── --}}
-        <div class="mt-16 bg-ink rounded-2xl p-10 text-center relative overflow-hidden">
+        <div class="mt-16 relative overflow-hidden rounded-2xl bg-ink p-6 sm:p-10 text-center">
             <div class="absolute inset-0 opacity-5" style="background-image:url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C8963E' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"></div>
             <div class="relative">
                 <p class="text-gold text-xs font-semibold uppercase tracking-widest mb-3">Besoin d'aide ?</p>

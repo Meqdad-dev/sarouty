@@ -209,6 +209,34 @@
             gap: 0.375rem;
             flex-shrink: 0;
         }
+        .dashboard-metric-grid {
+            display: grid;
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+            gap: 1rem;
+        }
+        .dashboard-content-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 1.5rem;
+            align-items: start;
+        }
+        .dashboard-main-column,
+        .dashboard-side-column {
+            min-width: 0;
+        }
+        .dashboard-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .dashboard-panel-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+        }
         
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-thumb { background: rgba(148,163,184,.45); border-radius: 999px; }
@@ -254,6 +282,56 @@
             }
         }
 
+        @media (min-width: 640px) {
+            .dashboard-metric-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .dashboard-metric-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .dashboard-content-grid {
+                grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+            }
+            .dashboard-side-column {
+                position: sticky;
+                top: 6rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-shell {
+                min-height: 100vh;
+                height: auto;
+                overflow-x: hidden;
+            }
+            .admin-main {
+                min-height: 100vh;
+                height: auto;
+            }
+            #user-topbar-inner {
+                align-items: stretch;
+            }
+            #user-topbar-title-wrap {
+                width: 100%;
+            }
+            #user-top-actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+            .dashboard-panel-header {
+                align-items: flex-start;
+            }
+            .dashboard-panel-actions {
+                width: 100%;
+            }
+        }
+
         @media (max-width: 640px) {
             #user-top-actions > * {
                 flex: 1 1 calc(50% - 0.75rem);
@@ -261,6 +339,9 @@
             #user-top-actions :is(a, button) {
                 width: 100%;
                 justify-content: center;
+            }
+            .dashboard-panel-actions > * {
+                flex: 1 1 100%;
             }
             .dashboard-list-media {
                 width: 100%;
@@ -282,7 +363,7 @@
     @stack('styles')
 </head>
 <body class="h-full bg-[var(--bg)] text-[var(--text)]" x-data="userLayout()" x-init="init()">
-<div class="admin-shell flex h-screen w-full overflow-hidden">
+<div class="admin-shell flex min-h-screen lg:h-screen w-full overflow-x-hidden">
     <template x-if="mobileSidebarOpen">
         <div class="admin-overlay lg:hidden fixed inset-0 bg-slate-900/40 z-30" @click="mobileSidebarOpen = false"></div>
     </template>
@@ -464,10 +545,10 @@
         </div>
     </aside>
 
-    <div class="admin-main flex-1 flex flex-col h-screen overflow-y-auto min-w-0 w-full">
+    <div class="admin-main flex-1 flex flex-col min-h-screen lg:h-screen overflow-y-auto min-w-0 w-full">
         <header class="admin-topbar sticky top-0 z-20 bg-[var(--bg)]/90 backdrop-blur-md border-b" style="border-color: var(--border)">
-            <div class="px-4 lg:px-8 py-4 flex items-center justify-between gap-3 sm:gap-4">
-                <div class="flex items-center gap-3 min-w-0 flex-1">
+            <div id="user-topbar-inner" class="px-4 lg:px-8 py-4 flex flex-col items-stretch gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
+                <div id="user-topbar-title-wrap" class="flex items-center gap-3 min-w-0 flex-1">
                     <button type="button" class="lg:hidden flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl panel"
                             @click="mobileSidebarOpen = true">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

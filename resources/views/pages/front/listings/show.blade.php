@@ -8,7 +8,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {{-- Fil d'Ariane --}}
-        <nav class="flex items-center gap-2 text-xs text-ink/50 mb-6">
+        <nav class="mb-6 flex flex-wrap items-center gap-2 text-xs text-ink/50">
             <a href="{{ route('home') }}" class="hover:text-gold">Accueil</a>
             <span>/</span>
             <a href="{{ route('listings.index') }}" class="hover:text-gold">Annonces</a>
@@ -18,7 +18,7 @@
             <span class="text-ink line-clamp-1">{{ Str::limit($listing->title, 50) }}</span>
         </nav>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
 
             {{-- ── Colonne principale (2/3) ── --}}
             <div class="lg:col-span-2 space-y-6">
@@ -27,7 +27,7 @@
                 <div x-data="{ active: 0 }" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-sand/60">
                     @if($listing->images->isNotEmpty())
                         {{-- Image principale --}}
-                        <div class="relative h-72 sm:h-96 overflow-hidden">
+                        <div class="relative h-64 overflow-hidden sm:h-80 lg:h-96">
                             @foreach($listing->images as $index => $image)
                                 <img src="{{ $image->url }}"
                                      alt="{{ $listing->title }} - photo {{ $index + 1 }}"
@@ -41,11 +41,11 @@
                             {{-- Navigation galerie --}}
                             @if($listing->images->count() > 1)
                                 <button @click="active = (active - 1 + {{ $listing->images->count() }}) % {{ $listing->images->count() }}"
-                                        class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all">
+                                        class="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-lg transition-all hover:bg-white sm:left-4 sm:h-10 sm:w-10">
                                     ‹
                                 </button>
                                 <button @click="active = (active + 1) % {{ $listing->images->count() }}"
-                                        class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all">
+                                        class="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-lg transition-all hover:bg-white sm:right-4 sm:h-10 sm:w-10">
                                     ›
                                 </button>
                                 <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
@@ -103,7 +103,7 @@
                                     </span>
                                 @endif
                             </div>
-                            <h1 class="font-display text-3xl font-bold text-ink leading-tight">{{ $listing->title }}</h1>
+                            <h1 class="font-display text-2xl sm:text-3xl font-bold text-ink leading-tight">{{ $listing->title }}</h1>
                         </div>
 
                         {{-- Favori --}}
@@ -122,7 +122,7 @@
                     </p>
 
                     <div>
-                        <div class="font-display text-4xl font-bold text-gold">
+                        <div class="font-display text-3xl sm:text-4xl font-bold text-gold break-words">
                             {{ $listing->formatted_price }}
                         </div>
                         @if($listing->surface && $listing->property_type === 'terrain')
@@ -130,6 +130,36 @@
                                 Soit {{ number_format($listing->price / $listing->surface, 0, ',', ' ') }} MAD/m²
                             </div>
                         @endif
+
+                        <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div class="rounded-2xl bg-sand p-4">
+                                <div class="text-xs font-semibold uppercase tracking-[0.2em] text-ink/40">Tarification</div>
+                                <div class="mt-2 text-sm font-semibold text-ink">
+                                    @if(in_array($listing->transaction_type, ['location', 'vacances']))
+                                        {{ \App\Models\Listing::PRICE_PERIODS[$listing->price_period] ?? 'Tarif flexible' }}
+                                    @else
+                                        Paiement unique
+                                    @endif
+                                </div>
+                                <p class="mt-1 text-xs leading-relaxed text-ink/50">
+                                    @if(in_array($listing->transaction_type, ['location', 'vacances']))
+                                        Le prix affiché correspond au tarif de cette annonce selon la période sélectionnée.
+                                    @else
+                                        Prix total du bien affiché sur l'annonce.
+                                    @endif
+                                </p>
+                            </div>
+                            <a href="{{ route('tarifs') }}" class="flex items-center justify-between rounded-2xl border border-gold/30 bg-gold/5 p-4 text-left transition hover:border-gold hover:bg-gold/10">
+                                <div>
+                                    <div class="text-xs font-semibold uppercase tracking-[0.2em] text-gold">Tarifs Sarouty</div>
+                                    <div class="mt-2 text-sm font-semibold text-ink">Voir les offres de publication</div>
+                                    <p class="mt-1 text-xs text-ink/50">Comparez les formules et options de visibilité.</p>
+                                </div>
+                                <svg class="h-5 w-5 flex-shrink-0 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                </svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -276,7 +306,7 @@
             <div class="space-y-5">
 
                 {{-- Contact agent --}}
-                <div class="bg-white rounded-2xl p-6 shadow-sm border border-sand/60 sticky top-24">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-sand/60 lg:sticky lg:top-24">
                     {{-- Profil du vendeur --}}
                     <div class="flex items-center gap-3 mb-5 pb-5 border-b border-sand">
                         <img src="{{ $listing->user->avatar_url }}" alt="{{ $listing->user->name }}"
@@ -350,7 +380,7 @@
         {{-- ── Annonces similaires ── --}}
         @if($similarListings->isNotEmpty())
             <div class="mt-16">
-                <h2 class="font-display text-3xl font-bold text-ink mb-8">Annonces similaires</h2>
+                <h2 class="font-display text-2xl sm:text-3xl font-bold text-ink mb-8">Annonces similaires</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                     @foreach($similarListings as $listing)
                         @include('components.listing-card', ['listing' => $listing])

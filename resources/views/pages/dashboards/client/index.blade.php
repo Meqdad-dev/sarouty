@@ -5,13 +5,13 @@
 @section('page_subtitle', 'Retrouvez vos annonces sauvegardées')
 
 @section('top_actions')
-    <a href="{{ route('listings.index') }}" class="inline-flex items-center gap-2 rounded-xl panel px-4 py-2 text-sm font-medium hover:border-gold/40 transition">
+    <a href="{{ route('listings.index') }}" class="topbar-btn inline-flex items-center justify-center gap-2 rounded-xl panel px-4 py-2 text-sm font-medium hover:border-gold/40 transition w-full sm:w-auto">
         Explorer le marché
     </a>
 @endsection
 
 @section('content')
-    <div class="panel rounded-[30px] p-6 shadow-sm sm:p-7 mb-6">
+    <div class="panel rounded-[30px] p-5 shadow-sm sm:p-7 mb-6">
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-gold">Collection</p>
@@ -36,14 +36,14 @@
             </a>
         </div>
     @else
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-6">
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 mb-6">
             @foreach($favorites as $listing)
                 @include('components.listing-card', ['listing' => $listing])
             @endforeach
         </div>
 
         @if($favorites->hasPages())
-            <div class="panel rounded-[24px] px-6 py-5 shadow-sm">
+            <div class="panel rounded-[24px] px-4 sm:px-6 py-5 shadow-sm">
                 {{ $favorites->links() }}
             </div>
         @endif

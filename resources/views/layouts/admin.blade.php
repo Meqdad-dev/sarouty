@@ -65,10 +65,18 @@
             font-family: 'Outfit', sans-serif;
             background: var(--bg);
             color: var(--text);
+            overflow-x: hidden;
         }
 
         .font-display { font-family: 'Cormorant Garamond', serif; }
-        .admin-shell { min-height: 100vh; display: flex; align-items: flex-start; }
+        .admin-shell {
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: clip;
+        }
         .admin-sidebar {
             width: 280px;
             position: sticky;
@@ -81,7 +89,12 @@
             box-shadow: var(--shadow);
             overscroll-behavior: contain;
         }
-        .admin-main { flex: 1; min-width: 0; }
+        .admin-main {
+            flex: 1;
+            min-width: 0;
+            width: 100%;
+            overflow-x: hidden;
+        }
         .admin-topbar {
             position: sticky;
             top: 0;
@@ -98,6 +111,24 @@
         .panel-soft {
             background: var(--panel-soft);
             border: 1px solid var(--border);
+        }
+        .admin-topbar-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .admin-topbar-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            flex-shrink: 0;
+            min-width: 0;
+        }
+        .admin-notification-panel {
+            width: min(20rem, calc(100vw - 1.5rem));
+            max-width: calc(100vw - 1.5rem);
         }
         .nav-item {
             display: flex;
@@ -279,6 +310,15 @@
                 width: 100%;
                 max-width: 100vw;
             }
+            .admin-topbar-inner {
+                flex-wrap: wrap;
+                align-items: flex-start;
+            }
+            .admin-topbar-actions {
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
             .admin-dashboard-list-item {
                 flex-wrap: wrap;
                 align-items: flex-start;
@@ -300,6 +340,23 @@
         }
 
         @media (max-width: 640px) {
+            .admin-topbar-actions {
+                align-items: stretch;
+            }
+            .admin-topbar-actions > .relative,
+            .admin-topbar-actions > button,
+            .admin-topbar-actions > div:not(#admin-top-actions) {
+                flex: 0 0 auto;
+            }
+            .admin-notification-panel {
+                right: 0;
+                left: auto;
+                width: min(22rem, calc(100vw - 1rem));
+                max-width: calc(100vw - 1rem);
+            }
+            #admin-top-actions {
+                width: 100%;
+            }
             #admin-top-actions > * {
                 flex: 1 1 calc(50% - 0.625rem);
             }
@@ -320,6 +377,10 @@
             }
             .admin-dashboard-list-actions :is(a, button) {
                 width: 100%;
+            }
+            #admin-main-content {
+                padding-left: 1rem;
+                padding-right: 1rem;
             }
         }
     </style>
@@ -567,7 +628,7 @@
 
     <div class="admin-main flex-1 flex flex-col h-screen overflow-y-auto min-w-0 w-full">
         <header class="admin-topbar sticky top-0 z-20 bg-[var(--bg)]/90 backdrop-blur-md border-b" style="border-color: var(--border)">
-            <div class="px-4 lg:px-8 py-4 flex items-center justify-between gap-3 sm:gap-4">
+            <div class="admin-topbar-inner px-4 lg:px-8 py-4">
                 <div class="flex items-center gap-3 min-w-0 flex-1">
                     <button type="button" class="lg:hidden flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl panel"
                             @click="mobileSidebarOpen = true">
@@ -583,7 +644,7 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                <div class="admin-topbar-actions">
                     <div id="admin-top-actions" class="w-full sm:w-auto">@yield('top_actions')</div>
                     
                     {{-- Chrono (Horloge en temps réel) --}}
@@ -618,7 +679,7 @@
                         <div x-show="open" 
                              x-transition.opacity.duration.200ms
                              style="display: none;"
-                             class="absolute right-0 mt-2 w-72 panel rounded-2xl shadow-xl overflow-hidden z-50 p-2">
+                             class="admin-notification-panel absolute right-0 mt-2 panel rounded-2xl shadow-xl overflow-hidden z-50 p-2">
                             <div class="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500 border-b border-gray-100 dark:border-gray-800">
                                 Centre de notifications
                             </div>
