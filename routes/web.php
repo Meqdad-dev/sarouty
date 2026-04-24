@@ -180,6 +180,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::post('/{sponsorship}/activer',[\App\Http\Controllers\Admin\SponsorshipController::class, 'activate'])->name('activate');
         Route::post('/{sponsorship}/pause',  [\App\Http\Controllers\Admin\SponsorshipController::class, 'pause'])->name('pause');
         Route::post('/{sponsorship}/reprendre',[\App\Http\Controllers\Admin\SponsorshipController::class, 'resume'])->name('resume');
+        Route::post('/{sponsorship}/approuver-annonce',[\App\Http\Controllers\Admin\SponsorshipController::class, 'approveListing'])->name('approve-listing');
+        Route::post('/{sponsorship}/refuser-annonce',[\App\Http\Controllers\Admin\SponsorshipController::class, 'rejectListing'])->name('reject-listing');
         Route::post('/{sponsorship}/annuler',[\App\Http\Controllers\Admin\SponsorshipController::class, 'cancel'])->name('cancel');
         Route::delete('/{sponsorship}',      [\App\Http\Controllers\Admin\SponsorshipController::class, 'destroy'])->name('destroy');
     });

@@ -32,6 +32,7 @@ class SubscriptionPlanSeeder extends Seeder
                     'Visibilité standard',
                     'Support email',
                 ],
+                'theme_color' => 'gray',
                 'is_active' => true,
             ],
             [
@@ -55,6 +56,7 @@ class SubscriptionPlanSeeder extends Seeder
                     'Mise en avant des annonces',
                     'Statistiques détaillées',
                 ],
+                'theme_color' => 'gold',
                 'is_active' => true,
             ],
             [
@@ -79,6 +81,7 @@ class SubscriptionPlanSeeder extends Seeder
                     'Statistiques avancées',
                     'Badge Agent vérifié',
                 ],
+                'theme_color' => 'ink',
                 'is_active' => true,
             ],
             [
@@ -104,6 +107,7 @@ class SubscriptionPlanSeeder extends Seeder
                     'Badge Agence certifiée',
                     'Accès API & export CSV',
                 ],
+                'theme_color' => 'terracotta',
                 'is_active' => true,
             ],
         ];

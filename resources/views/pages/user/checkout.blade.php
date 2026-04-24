@@ -141,22 +141,19 @@
                 <h3 class="font-display font-semibold text-gray-900 dark:text-white mb-5">Recapitulatif</h3>
 
                 @if($type === 'subscription')
+                    @php $theme = $plan->theme_preset; @endphp
                     <div class="flex items-center gap-3 mb-5 pb-5 border-b border-gray-100 dark:border-gray-800">
-                        @php
-                            $colorMap = ['starter' => 'gold', 'agence' => 'terracotta', 'gratuit' => 'gray'];
-                            $color = $colorMap[$plan->slug] ?? 'ink';
-                            $iconColorMap = [
-                                'gold' => 'bg-gold/10 text-gold',
-                                'ink' => 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300',
-                                'terracotta' => 'bg-orange-50 dark:bg-orange-900/20 text-orange-600',
-                            ];
-                            $iconColor = $iconColorMap[$color] ?? 'bg-gray-100 text-gray-500';
-                        @endphp
-                        <div class="w-12 h-12 rounded-xl {{ $iconColor }} flex items-center justify-center">
+                        <div class="w-12 h-12 rounded-2xl flex items-center justify-center border"
+                             style="background: {{ $theme['soft'] }}; color: {{ $theme['button'] }}; border-color: {{ $theme['border'] }}; box-shadow: 0 14px 28px {{ $theme['glow'] }};">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
                         </div>
                         <div>
-                            <p class="font-semibold text-gray-900 dark:text-white">Plan {{ $plan->name }}</p>
+                            <div class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] mb-2"
+                                 style="background: {{ $theme['soft'] }}; color: {{ $theme['text'] }}; border: 1px solid {{ $theme['border'] }};">
+                                <span class="w-2.5 h-2.5 rounded-full" style="background: {{ $theme['hex'] }};"></span>
+                                {{ $plan->theme_name }}
+                            </div>
+                            <p class="font-semibold" style="color: {{ $theme['text'] }};">Plan {{ $plan->name }}</p>
                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ $plan->duration_days ?? 30 }} jours</p>
                         </div>
                     </div>
@@ -164,7 +161,7 @@
                     <div class="space-y-3 mb-5 pb-5 border-b border-gray-100 dark:border-gray-800">
                         @foreach(array_slice($plan->features ?? [], 0, 4) as $feature)
                             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <svg class="w-3.5 h-3.5 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                <svg class="w-3.5 h-3.5 flex-shrink-0" style="color: {{ $theme['button'] }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                                 {{ $feature }}
                             </div>
                         @endforeach
@@ -215,7 +212,7 @@
                     <div class="border-t border-gray-100 dark:border-gray-800 pt-3 mt-3">
                         <div class="flex items-center justify-between">
                             <span class="font-semibold text-gray-900 dark:text-white">Total</span>
-                            <span class="font-display text-2xl font-bold text-gold">
+                            <span class="font-display text-2xl font-bold" style="color: {{ $type === 'subscription' ? $plan->theme_preset['button'] : '#C8963E' }};">
                                 {{ $type === 'subscription' ? $plan->price : $sponsorshipType['price'] }} MAD
                             </span>
                         </div>

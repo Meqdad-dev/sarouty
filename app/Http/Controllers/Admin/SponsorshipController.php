@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Sponsorship;
 use App\Models\Listing;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -16,36 +15,31 @@ class SponsorshipController extends Controller
         $this->middleware(['auth', 'role:admin']);
     }
 
-    /**
-     * Display a listing of sponsorships.
-     */
     public function index(Request $request)
     {
         $query = Sponsorship::with(['listing.images', 'user']);
 
-        // Filter by status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Filter by type
         if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
 
-        // Search
         if ($request->filled('q')) {
             $q = $request->q;
-            $query->whereHas('listing', function ($listingQuery) use ($q) {
-                $listingQuery->where('title', 'like', "%{$q}%");
-            })->orWhereHas('user', function ($userQuery) use ($q) {
-                $userQuery->where('name', 'like', "%{$q}%");
+            $query->where(function ($searchQuery) use ($q) {
+                $searchQuery->whereHas('listing', function ($listingQuery) use ($q) {
+                    $listingQuery->where('title', 'like', "%{$q}%");
+                })->orWhereHas('user', function ($userQuery) use ($q) {
+                    $userQuery->where('name', 'like', "%{$q}%");
+                });
             });
         }
 
         $sponsorships = $query->latest()->paginate(20)->withQueryString();
 
-        // Stats
         $stats = [
             'total' => Sponsorship::count(),
             'active' => Sponsorship::where('status', 'active')->count(),
@@ -57,19 +51,13 @@ class SponsorshipController extends Controller
         return view('pages.admin.sponsorships.index', compact('sponsorships', 'stats'));
     }
 
-    /**
-     * Display a specific sponsorship.
-     */
     public function show(Sponsorship $sponsorship)
     {
         $sponsorship->load(['listing.images', 'listing.user', 'user', 'payment']);
-        
+
         return view('pages.admin.sponsorships.show', compact('sponsorship'));
     }
 
-    /**
-     * Create a new sponsorship for a listing.
-     */
     public function create(Request $request)
     {
         $listing = null;
@@ -85,9 +73,6 @@ class SponsorshipController extends Controller
         ]);
     }
 
-    /**
-     * Store a new sponsorship.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -101,13 +86,14 @@ class SponsorshipController extends Controller
             'admin_notes' => 'nullable|string|max:500',
         ]);
 
-        // Set expires_at based on duration
         if ($validated['status'] === 'active') {
             $validated['starts_at'] = $validated['starts_at'] ?? now();
             $validated['expires_at'] = \Carbon\Carbon::parse($validated['starts_at'])->addDays($validated['duration_days']);
         }
 
         $sponsorship = Sponsorship::create($validated);
+        $sponsorship->load('listing');
+        $sponsorship->syncListingState();
 
         Cache::forget('admin_dashboard_stats');
 
@@ -115,9 +101,6 @@ class SponsorshipController extends Controller
             ->with('success', 'Sponsorship créé avec succès.');
     }
 
-    /**
-     * Edit a sponsorship.
-     */
     public function edit(Sponsorship $sponsorship)
     {
         $sponsorship->load(['listing.user', 'listing.images']);
@@ -130,9 +113,6 @@ class SponsorshipController extends Controller
         ]);
     }
 
-    /**
-     * Update a sponsorship.
-     */
     public function update(Request $request, Sponsorship $sponsorship)
     {
         $validated = $request->validate([
@@ -146,6 +126,8 @@ class SponsorshipController extends Controller
         ]);
 
         $sponsorship->update($validated);
+        $sponsorship->refresh()->load('listing');
+        $sponsorship->syncListingState();
 
         Cache::forget('admin_dashboard_stats');
 
@@ -153,58 +135,114 @@ class SponsorshipController extends Controller
             ->with('success', 'Sponsorship mis à jour avec succès.');
     }
 
-    /**
-     * Activate a pending sponsorship.
-     */
     public function activate(Sponsorship $sponsorship)
     {
+        $sponsorship->load('listing');
         $sponsorship->activate();
 
         Cache::forget('admin_dashboard_stats');
+        Cache::forget('featured_listings');
 
         return back()->with('success', 'Sponsorship activé avec succès.');
     }
 
-    /**
-     * Pause an active sponsorship.
-     */
     public function pause(Sponsorship $sponsorship)
     {
+        $sponsorship->load('listing');
         $sponsorship->pause();
+
+        Cache::forget('admin_dashboard_stats');
 
         return back()->with('success', 'Sponsorship mis en pause.');
     }
 
-    /**
-     * Resume a paused sponsorship.
-     */
     public function resume(Sponsorship $sponsorship)
     {
+        $sponsorship->load('listing');
         $sponsorship->resume();
+
+        Cache::forget('admin_dashboard_stats');
 
         return back()->with('success', 'Sponsorship réactivé.');
     }
 
-    /**
-     * Cancel a sponsorship.
-     */
     public function cancel(Sponsorship $sponsorship)
     {
-        $sponsorship->cancel();
+        $sponsorship->load('listing');
+        $sponsorship->cancel('Sponsorisation annulée depuis le tableau d\'administration.');
 
         Cache::forget('admin_dashboard_stats');
+        Cache::forget('featured_listings');
 
         return back()->with('success', 'Sponsorship annulé.');
     }
 
-    /**
-     * Delete a sponsorship.
-     */
-    public function destroy(Sponsorship $sponsorship)
+    public function approveListing(Sponsorship $sponsorship)
     {
-        $sponsorship->delete();
+        $sponsorship->load('listing');
+
+        if (!$sponsorship->listing) {
+            return back()->with('error', 'Annonce introuvable.');
+        }
+
+        $sponsorship->listing->update([
+            'status' => 'active',
+            'rejection_reason' => null,
+        ]);
+
+        $sponsorship->syncFromListingStatus('active');
 
         Cache::forget('admin_dashboard_stats');
+        Cache::forget('featured_listings');
+
+        return back()->with('success', 'L\'annonce sponsorisée a été acceptée depuis la page Sponsorisations.');
+    }
+
+    public function rejectListing(Request $request, Sponsorship $sponsorship)
+    {
+        $sponsorship->load('listing');
+
+        if (!$sponsorship->listing) {
+            return back()->with('error', 'Annonce introuvable.');
+        }
+
+        $reason = trim((string) $request->input('rejection_reason', 'Annonce refusée depuis la gestion des sponsorisations.'));
+        if (mb_strlen($reason) < 10) {
+            $reason = 'Annonce refusée depuis la gestion des sponsorisations.';
+        }
+
+        $sponsorship->listing->update([
+            'status' => 'rejected',
+            'rejection_reason' => $reason,
+        ]);
+
+        $sponsorship->cancel($reason);
+
+        Cache::forget('admin_dashboard_stats');
+        Cache::forget('featured_listings');
+
+        return back()->with('success', 'L\'annonce sponsorisée a été refusée depuis la page Sponsorisations.');
+    }
+
+    public function destroy(Sponsorship $sponsorship)
+    {
+        $sponsorship->load('listing');
+        $listing = $sponsorship->listing;
+
+        $sponsorship->delete();
+
+        if ($listing) {
+            $latestSponsorship = $listing->sponsorships()->latest()->first();
+
+            if ($latestSponsorship) {
+                $latestSponsorship->syncFromListingStatus($listing->status);
+            } else {
+                $listing->deactivateSponsorship();
+            }
+        }
+
+        Cache::forget('admin_dashboard_stats');
+        Cache::forget('featured_listings');
 
         return redirect()->route('admin.sponsorships.index')
             ->with('success', 'Sponsorship supprimé.');

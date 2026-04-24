@@ -44,14 +44,15 @@ class Payment extends Model
         'status' => 'pending',
     ];
 
-    // ─── Relations ────────────────────────────────────────────────────────────
-
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // ─── Scopes ───────────────────────────────────────────────────────────────
+    public function planDefinition()
+    {
+        return $this->belongsTo(SubscriptionPlan::class, 'plan', 'slug');
+    }
 
     public function scopeCompleted($query)
     {
@@ -74,11 +75,43 @@ class Payment extends Model
             ->where('expires_at', '>', now());
     }
 
-    // ─── Accessors ────────────────────────────────────────────────────────────
+    public function getPlanConfigAttribute(): array
+    {
+        $plan = $this->relationLoaded('planDefinition')
+            ? $this->planDefinition
+            : User::getPlanConfig($this->plan);
+
+        if ($plan) {
+            return [
+                'name' => $plan->name,
+                'price' => (float) $plan->price,
+                'theme_key' => $plan->theme_key,
+                'theme_preset' => $plan->theme_preset,
+            ];
+        }
+
+        $fallback = self::PLANS[$this->plan] ?? ['name' => ucfirst($this->plan), 'price' => 0];
+        $themeKey = SubscriptionPlan::defaultThemeForSlug($this->plan);
+
+        return array_merge($fallback, [
+            'theme_key' => $themeKey,
+            'theme_preset' => SubscriptionPlan::THEME_PRESETS[$themeKey] ?? SubscriptionPlan::THEME_PRESETS['gray'],
+        ]);
+    }
 
     public function getPlanLabelAttribute(): string
     {
-        return self::PLANS[$this->plan]['name'] ?? ucfirst($this->plan);
+        return $this->plan_config['name'] ?? ucfirst($this->plan);
+    }
+
+    public function getPlanThemeKeyAttribute(): string
+    {
+        return $this->plan_config['theme_key'] ?? SubscriptionPlan::defaultThemeForSlug($this->plan);
+    }
+
+    public function getPlanThemePresetAttribute(): array
+    {
+        return $this->plan_config['theme_preset'] ?? (SubscriptionPlan::THEME_PRESETS[$this->plan_theme_key] ?? SubscriptionPlan::THEME_PRESETS['gray']);
     }
 
     public function getStatusLabelAttribute(): string
@@ -104,8 +137,8 @@ class Payment extends Model
 
     public function getIsActiveAttribute(): bool
     {
-        return $this->status === 'completed' 
-            && $this->expires_at 
+        return $this->status === 'completed'
+            && $this->expires_at
             && $this->expires_at->isFuture();
     }
 
@@ -114,6 +147,7 @@ class Payment extends Model
         if (!$this->expires_at || $this->status !== 'completed') {
             return 0;
         }
+
         return max(0, now()->diffInDays($this->expires_at, false));
     }
 }

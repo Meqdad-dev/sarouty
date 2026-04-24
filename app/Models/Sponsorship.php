@@ -40,8 +40,6 @@ class Sponsorship extends Model
         'contacts' => 0,
     ];
 
-    // ─── Constants ───────────────────────────────────────────────────────────
-
     const TYPES = [
         'basic' => [
             'label' => 'Basique',
@@ -68,8 +66,6 @@ class Sponsorship extends Model
         'cancelled' => 'Annulée',
     ];
 
-    // ─── Relations ────────────────────────────────────────────────────────────
-
     public function listing(): BelongsTo
     {
         return $this->belongsTo(Listing::class);
@@ -84,8 +80,6 @@ class Sponsorship extends Model
     {
         return $this->belongsTo(Payment::class);
     }
-
-    // ─── Scopes ───────────────────────────────────────────────────────────────
 
     public function scopeActive($query)
     {
@@ -107,8 +101,6 @@ class Sponsorship extends Model
                     ->where('expires_at', '<=', now());
             });
     }
-
-    // ─── Accessors ────────────────────────────────────────────────────────────
 
     public function getTypeLabelAttribute(): string
     {
@@ -142,6 +134,7 @@ class Sponsorship extends Model
         if (!$this->expires_at || $this->status !== 'active') {
             return 0;
         }
+
         return max(0, now()->diffInDays($this->expires_at, false));
     }
 
@@ -150,6 +143,7 @@ class Sponsorship extends Model
         if ($this->impressions === 0) {
             return 0;
         }
+
         return round(($this->clicks / $this->impressions) * 100, 2);
     }
 
@@ -160,35 +154,128 @@ class Sponsorship extends Model
             && $this->expires_at > now();
     }
 
-    // ─── Methods ──────────────────────────────────────────────────────────────
+    public function syncListingState(): void
+    {
+        $listing = $this->listing;
+
+        if (!$listing) {
+            return;
+        }
+
+        if ($this->status === 'active') {
+            $expiresAt = $this->expires_at ?: now()->addDays($this->duration_days ?: (self::TYPES[$this->type]['days'] ?? 7));
+
+            $listing->update([
+                'is_sponsored' => true,
+                'sponsored_until' => $expiresAt,
+            ]);
+
+            return;
+        }
+
+        if (in_array($this->status, ['pending', 'paused'], true)) {
+            $listing->update([
+                'is_sponsored' => true,
+                'sponsored_until' => $this->expires_at,
+            ]);
+
+            return;
+        }
+
+        $listing->deactivateSponsorship();
+    }
+
+    public function forcePending(): void
+    {
+        $this->update([
+            'status' => 'pending',
+            'starts_at' => null,
+        ]);
+
+        $this->syncListingState();
+    }
 
     public function activate(): void
     {
         $this->update([
             'status' => 'active',
             'starts_at' => now(),
-            'expires_at' => now()->addDays($this->duration_days),
+            'expires_at' => now()->addDays($this->duration_days ?: (self::TYPES[$this->type]['days'] ?? 7)),
         ]);
+
+        $this->syncListingState();
     }
 
     public function pause(): void
     {
         $this->update(['status' => 'paused']);
+        $this->syncListingState();
     }
 
     public function resume(): void
     {
-        $this->update(['status' => 'active']);
+        $payload = ['status' => 'active'];
+
+        if (!$this->expires_at || $this->expires_at->isPast()) {
+            $payload['starts_at'] = now();
+            $payload['expires_at'] = now()->addDays($this->duration_days ?: (self::TYPES[$this->type]['days'] ?? 7));
+        }
+
+        $this->update($payload);
+        $this->syncListingState();
     }
 
-    public function cancel(): void
+    public function cancel(?string $reason = null): void
     {
-        $this->update(['status' => 'cancelled']);
+        $payload = ['status' => 'cancelled'];
+
+        if ($reason) {
+            $payload['admin_notes'] = trim(($this->admin_notes ? $this->admin_notes . "\n" : '') . $reason);
+        }
+
+        $this->update($payload);
+        $this->syncListingState();
     }
 
     public function markExpired(): void
     {
         $this->update(['status' => 'expired']);
+        $this->syncListingState();
+    }
+
+    public function syncFromListingStatus(?string $listingStatus = null): void
+    {
+        $status = $listingStatus ?? $this->listing?->status;
+
+        if (!$status) {
+            return;
+        }
+
+        if ($status === 'active') {
+            if ($this->status === 'pending') {
+                $this->activate();
+            } elseif ($this->status === 'paused') {
+                $this->resume();
+            } elseif ($this->status === 'active') {
+                $this->syncListingState();
+            }
+
+            return;
+        }
+
+        if ($status === 'pending') {
+            $this->forcePending();
+            return;
+        }
+
+        if ($status === 'rejected') {
+            $this->cancel('Annonce refusée depuis la modération.');
+            return;
+        }
+
+        if (in_array($status, ['sold', 'rented'], true)) {
+            $this->cancel('Annonce clôturée depuis la gestion des annonces.');
+        }
     }
 
     public function incrementImpressions(): void

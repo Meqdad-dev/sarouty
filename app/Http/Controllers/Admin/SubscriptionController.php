@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
+use App\Models\SubscriptionPlan;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -15,25 +16,19 @@ class SubscriptionController extends Controller
         $this->middleware(['auth', 'role:admin']);
     }
 
-    /**
-     * Display a listing of subscriptions.
-     */
     public function index(Request $request)
     {
-        $query = Payment::with(['user'])
+        $query = Payment::with(['user', 'planDefinition'])
             ->whereIn('status', ['completed', 'pending']);
 
-        // Filter by status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Filter by plan
         if ($request->filled('plan')) {
             $query->where('plan', $request->plan);
         }
 
-        // Filter by active/expired
         if ($request->filled('active')) {
             if ($request->active === 'yes') {
                 $query->where('expires_at', '>', now());
@@ -45,7 +40,6 @@ class SubscriptionController extends Controller
             }
         }
 
-        // Search
         if ($request->filled('q')) {
             $q = $request->q;
             $query->where(function ($sub) use ($q) {
@@ -58,8 +52,8 @@ class SubscriptionController extends Controller
         }
 
         $subscriptions = $query->latest()->paginate(20)->withQueryString();
+        $availablePlans = SubscriptionPlan::orderBy('priority_level')->get();
 
-        // Stats
         $stats = [
             'total' => Payment::whereIn('status', ['completed', 'pending'])->count(),
             'active' => Payment::where('status', 'completed')
@@ -76,24 +70,18 @@ class SubscriptionController extends Controller
             ],
         ];
 
-        return view('pages.admin.subscriptions.index', compact('subscriptions', 'stats'));
+        return view('pages.admin.subscriptions.index', compact('subscriptions', 'stats', 'availablePlans'));
     }
 
-    /**
-     * Display a specific subscription/payment.
-     */
     public function show(Payment $payment)
     {
         $payment->load(['user.listings' => function ($query) {
             $query->latest()->take(5);
-        }]);
+        }, 'planDefinition']);
 
         return view('pages.admin.subscriptions.show', compact('payment'));
     }
 
-    /**
-     * Extend a subscription.
-     */
     public function extend(Request $request, Payment $payment)
     {
         $request->validate([
@@ -108,7 +96,6 @@ class SubscriptionController extends Controller
 
         $payment->save();
 
-        // Also update user's plan_expires_at
         if ($payment->user && $payment->user->plan === $payment->plan) {
             $payment->user->update([
                 'plan_expires_at' => $payment->expires_at,
@@ -120,14 +107,10 @@ class SubscriptionController extends Controller
         return back()->with('success', "Abonnement prolongé de {$request->days} jours.");
     }
 
-    /**
-     * Cancel a subscription.
-     */
     public function cancel(Payment $payment)
     {
         $payment->update(['status' => 'refunded']);
 
-        // Downgrade user to free if this was their active plan
         if ($payment->user && $payment->user->plan === $payment->plan) {
             $payment->user->downgradeToFree();
         }
@@ -137,9 +120,6 @@ class SubscriptionController extends Controller
         return back()->with('success', 'Abonnement annulé et remboursé.');
     }
 
-    /**
-     * Create a new subscription for a user (admin override).
-     */
     public function create(Request $request)
     {
         $users = User::where('is_active', true)
@@ -151,44 +131,49 @@ class SubscriptionController extends Controller
             $selectedUser = User::find($request->user_id);
         }
 
+        $plans = SubscriptionPlan::where('is_active', true)
+            ->orderBy('priority_level')
+            ->get()
+            ->keyBy('slug');
+
         return view('pages.admin.subscriptions.form', [
             'payment' => new Payment(),
             'users' => $users,
             'selectedUser' => $selectedUser,
-            'plans' => Payment::PLANS,
+            'plans' => $plans,
         ]);
     }
 
-    /**
-     * Store a new subscription (admin override).
-     */
     public function store(Request $request)
     {
+        $availablePlanSlugs = SubscriptionPlan::where('is_active', true)
+            ->where('slug', '!=', 'gratuit')
+            ->pluck('slug')
+            ->all();
+
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'plan' => 'required|in:starter,pro,agence',
+            'plan' => 'required|in:' . implode(',', $availablePlanSlugs),
             'duration_days' => 'required|integer|min:1|max:365',
             'amount' => 'nullable|numeric|min:0',
             'admin_notes' => 'nullable|string|max:500',
         ]);
 
-        $plan = $validated['plan'];
+        $plan = SubscriptionPlan::where('slug', $validated['plan'])->firstOrFail();
         $durationDays = $validated['duration_days'];
-        $amount = $validated['amount'] ?? Payment::PLANS[$plan]['price'] ?? 0;
+        $amount = $validated['amount'] ?? $plan->price ?? 0;
 
-        // Create payment record
         $payment = Payment::create([
             'user_id' => $validated['user_id'],
-            'plan' => $plan,
+            'plan' => $plan->slug,
             'amount' => $amount,
             'currency' => 'MAD',
             'status' => 'completed',
             'expires_at' => now()->addDays($durationDays),
         ]);
 
-        // Upgrade user
         $user = User::find($validated['user_id']);
-        $user->upgradeToPlan($plan, $durationDays);
+        $user->upgradeToPlan($plan->slug, $durationDays);
 
         Cache::forget('admin_dashboard_stats');
 
@@ -196,26 +181,24 @@ class SubscriptionController extends Controller
             ->with('success', 'Abonnement créé avec succès.');
     }
 
-    /**
-     * Edit subscription.
-     */
     public function edit(Payment $payment)
     {
+        $plans = SubscriptionPlan::orderBy('priority_level')->get()->keyBy('slug');
+
         return view('pages.admin.subscriptions.form', [
-            'payment' => $payment,
+            'payment' => $payment->load('planDefinition'),
             'users' => User::orderBy('name')->get(['id', 'name', 'email', 'plan']),
             'selectedUser' => $payment->user,
-            'plans' => Payment::PLANS,
+            'plans' => $plans,
         ]);
     }
 
-    /**
-     * Update subscription.
-     */
     public function update(Request $request, Payment $payment)
     {
+        $availablePlanSlugs = SubscriptionPlan::pluck('slug')->filter(fn ($slug) => $slug !== 'gratuit')->all();
+
         $validated = $request->validate([
-            'plan' => 'required|in:starter,pro,agence',
+            'plan' => 'required|in:' . implode(',', $availablePlanSlugs),
             'status' => 'required|in:pending,completed,failed,refunded',
             'expires_at' => 'nullable|date',
             'admin_notes' => 'nullable|string|max:500',
@@ -223,15 +206,19 @@ class SubscriptionController extends Controller
 
         $payment->update($validated);
 
+        if ($payment->user && $validated['status'] === 'completed') {
+            $payment->user->update([
+                'plan' => $validated['plan'],
+                'plan_expires_at' => $validated['expires_at'] ?? $payment->expires_at,
+            ]);
+        }
+
         Cache::forget('admin_dashboard_stats');
 
         return redirect()->route('admin.subscriptions.show', $payment)
             ->with('success', 'Abonnement mis à jour.');
     }
 
-    /**
-     * Get subscription statistics for dashboard.
-     */
     public function stats()
     {
         return response()->json([

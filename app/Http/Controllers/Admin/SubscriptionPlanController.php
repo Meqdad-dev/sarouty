@@ -13,25 +13,28 @@ class SubscriptionPlanController extends Controller
     public function index()
     {
         $plans = SubscriptionPlan::orderBy('priority_level')->get();
+
         return view('pages.admin.plans.index', compact('plans'));
     }
 
     public function create()
     {
-        return view('pages.admin.plans.create');
+        return view('pages.admin.plans.create', [
+            'themePresets' => SubscriptionPlan::THEME_PRESETS,
+        ]);
     }
 
     public function store(Request $request)
     {
         if ($request->filled('features') && is_string($request->features)) {
             $request->merge([
-                'features' => array_filter(array_map('trim', explode("\n", $request->features)))
+                'features' => array_filter(array_map('trim', explode("\n", $request->features))),
             ]);
         }
 
         $validated = $request->validate($this->rules());
         $validated['slug'] = Str::slug($validated['name']);
-        
+
         SubscriptionPlan::create($validated);
         Cache::forget('subscription_plans_all');
 
@@ -40,18 +43,22 @@ class SubscriptionPlanController extends Controller
 
     public function edit(SubscriptionPlan $plan)
     {
-        return view('pages.admin.plans.edit', compact('plan'));
+        return view('pages.admin.plans.edit', [
+            'plan' => $plan,
+            'themePresets' => SubscriptionPlan::THEME_PRESETS,
+        ]);
     }
 
     public function update(Request $request, SubscriptionPlan $plan)
     {
         if ($request->has('features') && is_string($request->features)) {
             $request->merge([
-                'features' => array_filter(array_map('trim', explode("\n", $request->features)))
+                'features' => array_filter(array_map('trim', explode("\n", $request->features))),
             ]);
         }
 
         $validated = $request->validate($this->rules($plan->id));
+
         if ($plan->slug !== 'gratuit') {
             $validated['slug'] = Str::slug($validated['name']);
         }
@@ -91,6 +98,7 @@ class SubscriptionPlanController extends Controller
             'is_active' => 'boolean',
             'features' => 'nullable|array',
             'features.*' => 'string|max:255',
+            'theme_color' => 'required|in:' . implode(',', array_keys(SubscriptionPlan::THEME_PRESETS)),
         ];
     }
 }

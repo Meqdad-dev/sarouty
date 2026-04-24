@@ -196,27 +196,7 @@ class AdminController extends Controller
     public function listingApprove(Listing $listing)
     {
         $listing->update(['status' => 'active', 'rejection_reason' => null]);
-
-        if ($listing->is_sponsored) {
-            $sponsorship = $listing->sponsorships()
-                ->whereIn('status', ['pending', 'paused'])
-                ->latest()
-                ->first();
-
-            if ($sponsorship) {
-                $expiresAt = now()->addDays($sponsorship->duration_days ?: 7);
-                $sponsorship->update([
-                    'status' => 'active',
-                    'starts_at' => now(),
-                    'expires_at' => $expiresAt,
-                ]);
-
-                $listing->update([
-                    'is_sponsored' => true,
-                    'sponsored_until' => $expiresAt,
-                ]);
-            }
-        }
+        $this->syncLatestSponsorshipForListing($listing);
 
         Cache::forget('admin_dashboard_stats');
         Cache::forget('featured_listings');
@@ -233,8 +213,10 @@ class AdminController extends Controller
         $request->validate(['rejection_reason' => 'required|string|min:10|max:500']);
 
         $listing->update(['status' => 'rejected', 'rejection_reason' => $request->rejection_reason]);
+        $this->syncLatestSponsorshipForListing($listing);
 
         Cache::forget('admin_dashboard_stats');
+        Cache::forget('featured_listings');
 
         // Notification asynchrone
         \App\Jobs\NotifyListingRejected::dispatch($listing)->onQueue('notifications');
@@ -483,13 +465,31 @@ class AdminController extends Controller
 
         $listing->update([
             'status' => $newStatus,
-            'rejection_reason' => $newStatus === 'rejected' ? $listing->rejection_reason : null,
+            'rejection_reason' => $newStatus === 'rejected'
+                ? ($listing->rejection_reason ?: 'Annonce refusée depuis la gestion des annonces.')
+                : null,
         ]);
+
+        $this->syncLatestSponsorshipForListing($listing);
 
         Cache::forget('admin_dashboard_stats');
         Cache::forget('featured_listings');
 
         return back()->with('success', "Le statut a été modifié de « " . Listing::STATUSES[$oldStatus] . " » à « " . Listing::STATUSES[$newStatus] . " ».");
+    }
+
+    protected function syncLatestSponsorshipForListing(Listing $listing): void
+    {
+        $sponsorship = $listing->sponsorships()->latest()->first();
+
+        if (!$sponsorship) {
+            if ($listing->status !== 'active') {
+                $listing->deactivateSponsorship();
+            }
+            return;
+        }
+
+        $sponsorship->syncFromListingStatus($listing->status);
     }
 
     // ─── Utilisateurs ─────────────────────────────────────────────────────────

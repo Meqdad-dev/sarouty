@@ -2,7 +2,7 @@
 
 @section('title', ($payment->exists ? 'Modifier' : 'Créer') . ' un abonnement – Sarouty')
 @section('page_title', $payment->exists ? 'Modifier l\'abonnement' : 'Créer un abonnement')
-@section('page_subtitle', $payment->exists ? '#' . $payment->id . ' - ' . $payment->plan_label : 'Attribuer un plan à un utilisateur')
+@section('page_subtitle', $payment->exists ? '#' . $payment->id . ' - ' . $payment->plan_label : 'Attribuer un plan à un utilisateur avec un style visuel cohérent')
 
 @section('top_actions')
     @if($payment->exists)
@@ -24,9 +24,7 @@
         @endif
 
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            {{-- Main Form --}}
             <div class="xl:col-span-2 space-y-6">
-                {{-- User Selection (create only) --}}
                 @if(!$payment->exists)
                     <div class="panel rounded-2xl p-6">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
@@ -75,7 +73,6 @@
                     <input type="hidden" name="user_id" value="{{ $payment->user_id }}">
                 @endif
 
-                {{-- Plan Selection --}}
                 <div class="panel rounded-2xl p-6">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                         <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,36 +82,38 @@
                     </h3>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        @foreach($plans as $planKey => $planData)
+                        @foreach($plans as $planKey => $plan)
                             @if($planKey !== 'gratuit')
-                                <label class="relative block p-4 rounded-xl border-2 cursor-pointer transition
-                                             {{ old('plan', $payment->plan ?? '') === $planKey ? 'border-gold bg-gold/5' : 'border-gray-200 dark:border-gray-700 hover:border-gold/40' }}">
-                                    <input type="radio" name="plan" value="{{ $planKey }}" 
-                                           class="sr-only" 
-                                           {{ old('plan', $payment->plan ?? '') === $planKey ? 'checked' : '' }}
-                                           onchange="updatePlanDetails('{{ $planKey }}', {{ $planData['price'] }})">
-                                    <div class="text-center">
-                                        <div class="font-semibold text-gray-900 dark:text-white mb-1">{{ $planData['name'] }}</div>
-                                        <div class="text-2xl font-bold text-gold mb-1">{{ $planData['price'] }} MAD</div>
-                                        <div class="text-xs text-gray-500">/mois</div>
-                                    </div>
-                                    @if(old('plan', $payment->plan ?? '') === $planKey)
-                                        <div class="absolute top-2 right-2 w-5 h-5 rounded-full bg-gold flex items-center justify-center">
-                                            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                                            </svg>
+                                @php $theme = $plan->theme_preset; $checked = old('plan', $payment->plan ?? '') === $planKey; @endphp
+                                <label class="relative block p-4 rounded-[22px] border-2 cursor-pointer transition shadow-sm"
+                                       style="background: linear-gradient(135deg, {{ $theme['soft'] }}, #fff); border-color: {{ $checked ? $theme['hex'] : $theme['border'] }}; box-shadow: 0 18px 35px {{ $checked ? $theme['glow'] : 'rgba(15, 23, 42, 0.04)' }};">
+                                    <input type="radio" name="plan" value="{{ $planKey }}" class="sr-only" {{ $checked ? 'checked' : '' }} onchange="updatePlanDetails('{{ $planKey }}')">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div>
+                                            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[11px] font-semibold" style="background: #fff; color: {{ $theme['text'] }}; border: 1px solid {{ $theme['border'] }};">
+                                                <span class="w-2 h-2 rounded-full" style="background: {{ $theme['hex'] }};"></span>
+                                                {{ $plan->theme_name }}
+                                            </div>
+                                            <div class="mt-3 font-semibold text-gray-900 dark:text-white">{{ $plan->name }}</div>
+                                            <div class="text-2xl font-black mt-2" style="color: {{ $theme['button'] }};">{{ number_format($plan->price, 0, ',', ' ') }} MAD</div>
+                                            <div class="text-xs text-gray-500 mt-1">/{{ $plan->duration_days ?: 30 }} jours</div>
                                         </div>
-                                    @endif
+                                        @if($checked)
+                                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white" style="background: {{ $theme['button'] }};">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                                </svg>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </label>
                             @endif
                         @endforeach
                     </div>
                 </div>
 
-                {{-- Duration & Pricing --}}
                 <div class="panel rounded-2xl p-6">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Durée et tarification</h3>
-                    
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         @if(!$payment->exists)
                             <div>
@@ -128,7 +127,7 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Montant (MAD)</label>
                             <input type="number" name="amount" id="amount" value="{{ old('amount', $payment->amount ?? 0) }}" min="0" step="0.01"
                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-gold/50 focus:border-gold">
-                            <p class="text-xs text-gray-400 mt-1">Laissez vide pour utiliser le prix par défaut</p>
+                            <p class="text-xs text-gray-400 mt-1">Laissez vide pour utiliser le prix du plan sélectionné.</p>
                         </div>
                     </div>
 
@@ -141,7 +140,6 @@
                     @endif
                 </div>
 
-                {{-- Status (edit only) --}}
                 @if($payment->exists)
                     <div class="panel rounded-2xl p-6">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Statut</h3>
@@ -154,40 +152,43 @@
                 @endif
             </div>
 
-            {{-- Sidebar --}}
             <div class="space-y-6">
-                {{-- Summary --}}
+                @php
+                    $defaultKey = old('plan', $payment->plan ?? $plans->keys()->first());
+                    $defaultPlan = $plans[$defaultKey] ?? $plans->first();
+                    $defaultTheme = $defaultPlan?->theme_preset;
+                @endphp
                 <div class="panel rounded-2xl p-6">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Récapitulatif</h3>
-                    <div class="space-y-3 text-sm">
-                        @if(!$payment->exists)
-                            <div class="flex justify-between">
-                                <span class="text-gray-500">Durée</span>
-                                <span class="font-medium text-gray-900 dark:text-white"><span id="summary-days">30</span> jours</span>
+                    <div id="summary-card" class="rounded-[24px] border p-5" style="background: linear-gradient(135deg, {{ $defaultTheme['soft'] ?? '#F8FAFC' }}, #fff); border-color: {{ $defaultTheme['border'] ?? '#CBD5E1' }};">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <div class="text-xs uppercase tracking-[0.22em] text-gray-400">Plan choisi</div>
+                                <div class="mt-2 text-xl font-bold" id="summary-plan" style="color: {{ $defaultTheme['text'] ?? '#475569' }};">{{ $defaultPlan->name ?? 'Plan' }}</div>
                             </div>
-                        @endif
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">Plan</span>
-                            <span class="font-medium text-gray-900 dark:text-white" id="summary-plan">{{ $plans[$payment->plan ?? 'starter']['name'] ?? 'Starter' }}</span>
+                            <div class="w-12 h-12 rounded-2xl border-4 border-white shadow-lg" id="summary-swatch" style="background: linear-gradient(135deg, {{ $defaultTheme['hex'] ?? '#94A3B8' }}, {{ $defaultTheme['button_hover'] ?? '#1E293B' }});"></div>
                         </div>
-                        <hr class="border-gray-200 dark:border-gray-700">
-                        <div class="flex justify-between text-lg">
-                            <span class="font-semibold text-gray-900 dark:text-white">Total</span>
-                            <span class="font-bold text-gold" id="summary-total">{{ number_format($payment->amount ?? 99, 0, ',', ' ') }} MAD</span>
+                        <div class="space-y-3 text-sm mt-5">
+                            @if(!$payment->exists)
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Durée</span>
+                                    <span class="font-medium text-gray-900 dark:text-white"><span id="summary-days">30</span> jours</span>
+                                </div>
+                            @endif
+                            <div class="flex justify-between text-lg">
+                                <span class="font-semibold text-gray-900 dark:text-white">Total</span>
+                                <span class="font-bold" id="summary-total" style="color: {{ $defaultTheme['button'] ?? '#334155' }};">{{ number_format($payment->amount ?? ($defaultPlan->price ?? 0), 0, ',', ' ') }} MAD</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Features --}}
                 <div class="panel rounded-2xl p-6">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Avantages inclus</h3>
                     <ul class="space-y-2" id="plan-features">
-                        @php
-                            $defaultPlan = $payment->plan ?? 'starter';
-                        @endphp
-                        @foreach(\App\Models\User::PLANS[$defaultPlan]['features'] ?? [] as $feature)
+                        @foreach($defaultPlan?->features ?? [] as $feature)
                             <li class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <svg class="w-4 h-4 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 flex-shrink-0" style="color: {{ $defaultTheme['button'] ?? '#334155' }};" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <polyline points="20,6 9,17 4,12" stroke-width="2.5"/>
                                 </svg>
                                 {{ $feature }}
@@ -196,7 +197,6 @@
                     </ul>
                 </div>
 
-                {{-- Actions --}}
                 <div class="panel rounded-2xl p-6">
                     <button type="submit" class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gold text-white font-semibold hover:bg-gold-dark transition shadow-lg shadow-gold/30">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,38 +215,44 @@
 
 @push('scripts')
 <script>
-    const plans = @json($plans);
-    const planFeatures = @json(collect(\App\Models\User::PLANS)->mapWithKeys(fn($v, $k) => [$k => $v['features']]));
-    
-    function updatePlanDetails(planKey, price) {
-        document.getElementById('amount').value = price;
-        document.getElementById('summary-plan').textContent = plans[planKey].name;
-        
-        const days = parseInt(document.getElementById('duration_days')?.value || 30);
-        const total = price;
-        document.getElementById('summary-total').textContent = new Intl.NumberFormat('fr-FR').format(total) + ' MAD';
-        
-        // Update features
+    const plans = @json($plans->map(fn($plan) => [
+        'name' => $plan->name,
+        'price' => (float) $plan->price,
+        'features' => $plan->features ?? [],
+        'theme' => $plan->theme_preset,
+    ]));
+
+    function updatePlanDetails(planKey) {
+        const plan = plans[planKey];
+        if (!plan) return;
+
+        document.getElementById('amount').value = plan.price;
+        document.getElementById('summary-plan').textContent = plan.name;
+        document.getElementById('summary-total').textContent = new Intl.NumberFormat('fr-FR').format(plan.price) + ' MAD';
+        document.getElementById('summary-total').style.color = plan.theme.button;
+        document.getElementById('summary-swatch').style.background = `linear-gradient(135deg, ${plan.theme.hex}, ${plan.theme.button_hover})`;
+        document.getElementById('summary-card').style.background = `linear-gradient(135deg, ${plan.theme.soft}, #fff)`;
+        document.getElementById('summary-card').style.borderColor = plan.theme.border;
+        document.getElementById('summary-plan').style.color = plan.theme.text;
+
         const featuresList = document.getElementById('plan-features');
-        const features = planFeatures[planKey] || [];
-        featuresList.innerHTML = features.map(f => `
+        featuresList.innerHTML = (plan.features || []).map(f => `
             <li class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <svg class="w-4 h-4 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <polyline points="20,6 9,17 4,12" stroke-width="2.5"/>
+                <svg class="w-4 h-4 flex-shrink-0" style="color: ${plan.theme.button};" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <polyline points="20,6 9,17 4,12" stroke-width="2.5"></polyline>
                 </svg>
                 ${f}
             </li>
         `).join('');
     }
-    
+
     function calculateTotal() {
         const days = parseInt(document.getElementById('duration_days')?.value || 30);
         const selectedPlan = document.querySelector('input[name="plan"]:checked');
-        const pricePerMonth = selectedPlan ? plans[selectedPlan.value].price : 99;
-        const total = pricePerMonth;
-        
+        if (!selectedPlan) return;
+        const plan = plans[selectedPlan.value];
         document.getElementById('summary-days').textContent = days;
-        document.getElementById('summary-total').textContent = new Intl.NumberFormat('fr-FR').format(total) + ' MAD';
+        document.getElementById('summary-total').textContent = new Intl.NumberFormat('fr-FR').format(plan.price) + ' MAD';
     }
 </script>
 @endpush

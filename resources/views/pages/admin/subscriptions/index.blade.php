@@ -3,7 +3,7 @@
 
 @section('title', 'Abonnements – Sarouty')
 @section('page_title', 'Abonnements')
-@section('page_subtitle', 'Gérez les abonnements et les paiements récurrents')
+@section('page_subtitle', 'Gérez les abonnements, leurs couleurs et l’attribution des plans')
 
 @section('top_actions')
     <a href="{{ route('admin.subscriptions.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-gold text-white px-4 py-2.5 text-sm font-semibold hover:bg-gold-dark transition shadow-lg shadow-gold/30">
@@ -15,7 +15,6 @@
 @endsection
 
 @section('content')
-    {{-- Stats --}}
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         <div class="panel rounded-xl p-4 text-center">
             <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ number_format($stats['total']) }}</div>
@@ -51,7 +50,6 @@
         </div>
     </div>
 
-    {{-- Filters --}}
     <div class="panel rounded-2xl p-5 mb-6">
         <form method="GET" action="{{ route('admin.subscriptions.index') }}" class="flex flex-wrap items-end gap-4">
             <div class="flex-1 min-w-[200px]">
@@ -75,13 +73,13 @@
                 </select>
             </div>
 
-            <div class="w-36">
+            <div class="w-40">
                 <label class="block text-xs font-medium text-gray-500 mb-1.5">Plan</label>
                 <select name="plan" class="w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-gold/50">
                     <option value="">Tous</option>
-                    @foreach(\App\Models\Payment::PLANS as $value => $data)
-                        @if($value !== 'gratuit')
-                            <option value="{{ $value }}" {{ request('plan') === $value ? 'selected' : '' }}>{{ $data['name'] }}</option>
+                    @foreach($availablePlans as $plan)
+                        @if($plan->slug !== 'gratuit')
+                            <option value="{{ $plan->slug }}" {{ request('plan') === $plan->slug ? 'selected' : '' }}>{{ $plan->name }}</option>
                         @endif
                     @endforeach
                 </select>
@@ -107,7 +105,6 @@
         </form>
     </div>
 
-    {{-- Subscriptions Table --}}
     <div class="panel rounded-2xl overflow-hidden">
         @if($subscriptions->isEmpty())
             <div class="p-12 text-center">
@@ -133,15 +130,15 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                         @foreach($subscriptions as $subscription)
+                            @php $theme = $subscription->plan_theme_preset; @endphp
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
-                                {{-- User --}}
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style="background: {{ $theme['soft'] }};">
                                             @if($subscription->user?->avatar)
                                                 <img src="{{ $subscription->user->avatar_url }}" class="w-full h-full rounded-full object-cover">
                                             @else
-                                                <span class="text-gold font-bold text-sm">{{ strtoupper(substr($subscription->user->name ?? '?', 0, 1)) }}</span>
+                                                <span class="font-bold text-sm" style="color: {{ $theme['text'] }};">{{ strtoupper(substr($subscription->user->name ?? '?', 0, 1)) }}</span>
                                             @endif
                                         </div>
                                         <div>
@@ -151,18 +148,13 @@
                                     </div>
                                 </td>
 
-                                {{-- Plan --}}
                                 <td class="px-4 py-4">
-                                    <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold
-                                        @if($subscription->plan === 'agence') bg-purple-100 text-purple-700
-                                        @elseif($subscription->plan === 'pro') bg-blue-100 text-blue-700
-                                        @elseif($subscription->plan === 'starter') bg-emerald-100 text-emerald-700
-                                        @else bg-gray-100 text-gray-600 @endif">
+                                    <div class="inline-flex items-center gap-2 px-3 py-2 rounded-2xl border text-xs font-semibold" style="background: {{ $theme['soft'] }}; color: {{ $theme['text'] }}; border-color: {{ $theme['border'] }};">
+                                        <span class="w-2.5 h-2.5 rounded-full" style="background: {{ $theme['hex'] }};"></span>
                                         {{ $subscription->plan_label }}
-                                    </span>
+                                    </div>
                                 </td>
 
-                                {{-- Status --}}
                                 <td class="px-4 py-4">
                                     <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
                                         @if($subscription->status === 'completed') bg-emerald-100 text-emerald-700
@@ -181,12 +173,10 @@
                                     @endif
                                 </td>
 
-                                {{-- Amount --}}
                                 <td class="px-4 py-4">
                                     <span class="font-semibold text-gray-900 dark:text-white">{{ $subscription->formatted_amount }}</span>
                                 </td>
 
-                                {{-- Expiration --}}
                                 <td class="px-4 py-4">
                                     @if($subscription->expires_at)
                                         <div class="text-xs">
@@ -200,7 +190,6 @@
                                     @endif
                                 </td>
 
-                                {{-- Transaction --}}
                                 <td class="px-4 py-4">
                                     @if($subscription->stripe_payment_intent)
                                         <code class="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{{ substr($subscription->stripe_payment_intent, 0, 16) }}...</code>
@@ -211,7 +200,6 @@
                                     @endif
                                 </td>
 
-                                {{-- Actions --}}
                                 <td class="px-4 py-4">
                                     <div class="flex items-center justify-end gap-1">
                                         <a href="{{ route('admin.subscriptions.show', $subscription) }}"
@@ -223,7 +211,8 @@
                                             </svg>
                                         </a>
                                         <a href="{{ route('admin.subscriptions.edit', $subscription) }}"
-                                           class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gold transition"
+                                           class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 transition"
+                                           style="--tw-text-opacity:1; color: {{ $theme['button'] }};"
                                            title="Modifier">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -247,7 +236,6 @@
                 </table>
             </div>
 
-            {{-- Pagination --}}
             <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-700">
                 {{ $subscriptions->links() }}
             </div>
