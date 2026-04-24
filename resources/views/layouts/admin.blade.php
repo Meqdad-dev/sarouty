@@ -178,6 +178,7 @@
 
     <aside class="admin-sidebar flex-shrink-0 flex flex-col h-screen lg:sticky top-0 overflow-y-auto"
            :class="{ 'open': mobileSidebarOpen }">
+        <div id="admin-sidebar-content">
         <div class="px-6 py-6 border-b" style="border-color: var(--border)">
             <div class="flex items-center justify-center">
                 <img src="{{ asset('logo/logo.png') }}" alt="Sarouty" class="h-14 w-auto object-contain">
@@ -195,6 +196,39 @@
                 </div>
             </a>
         </div>
+
+        @php
+            $adminSidebarUserId = auth()->id();
+
+            if ($adminSidebarUserId) {
+                if (request()->routeIs('admin.listings.*')) cache()->put('admin_viewed_listings_' . $adminSidebarUserId, now());
+                if (request()->routeIs('admin.users.*')) cache()->put('admin_viewed_users_' . $adminSidebarUserId, now());
+                if (request()->routeIs('admin.reports.*')) cache()->put('admin_viewed_reports_' . $adminSidebarUserId, now());
+                if (request()->routeIs('admin.messages.*')) cache()->put('admin_viewed_messages_' . $adminSidebarUserId, now());
+                if (request()->routeIs('admin.sponsorships.*')) cache()->put('admin_viewed_sponsors_' . $adminSidebarUserId, now());
+                if (request()->routeIs('admin.subscriptions.*')) cache()->put('admin_viewed_subs_' . $adminSidebarUserId, now());
+                if (request()->routeIs('admin.payments.*')) cache()->put('admin_viewed_payments_' . $adminSidebarUserId, now());
+                if (request()->routeIs('admin.estimations.*')) cache()->put('admin_viewed_estimations_' . $adminSidebarUserId, now());
+            }
+
+            $adminLastViewedListings = cache('admin_viewed_listings_' . $adminSidebarUserId, now()->subYears(10));
+            $adminLastViewedUsers = cache('admin_viewed_users_' . $adminSidebarUserId, now()->subYears(10));
+            $adminLastViewedReports = cache('admin_viewed_reports_' . $adminSidebarUserId, now()->subYears(10));
+            $adminLastViewedMessages = cache('admin_viewed_messages_' . $adminSidebarUserId, now()->subYears(10));
+            $adminLastViewedSponsors = cache('admin_viewed_sponsors_' . $adminSidebarUserId, now()->subYears(10));
+            $adminLastViewedSubs = cache('admin_viewed_subs_' . $adminSidebarUserId, now()->subYears(10));
+            $adminLastViewedPayments = cache('admin_viewed_payments_' . $adminSidebarUserId, now()->subYears(10));
+            $adminLastViewedEstimations = cache('admin_viewed_estimations_' . $adminSidebarUserId, now()->subYears(10));
+
+            $newAdminListingsCount = \App\Models\Listing::where('created_at', '>', $adminLastViewedListings)->count();
+            $newAdminUsersCount = \App\Models\User::where('created_at', '>', $adminLastViewedUsers)->count();
+            $newAdminReportsCount = \App\Models\Report::where('created_at', '>', $adminLastViewedReports)->count();
+            $newAdminMessagesCount = \App\Models\Message::where('created_at', '>', $adminLastViewedMessages)->count();
+            $newAdminSponsorsCount = \App\Models\Sponsorship::where('created_at', '>', $adminLastViewedSponsors)->count();
+            $newAdminSubscriptionsCount = \App\Models\Payment::whereIn('status', ['completed', 'pending'])->where('created_at', '>', $adminLastViewedSubs)->count();
+            $newAdminPaymentsCount = \App\Models\Payment::where('created_at', '>', $adminLastViewedPayments)->count();
+            $newAdminEstimationsCount = \App\Models\Estimation::whereNotNull('contact_email')->where('created_at', '>', $adminLastViewedEstimations)->count();
+        @endphp
 
         <nav class="flex-1 px-4 py-5 space-y-1.5">
             <div class="text-[11px] uppercase tracking-[0.22em] px-2 pb-2" style="color: var(--text-soft)">Pilotage</div>
@@ -217,11 +251,8 @@
                     </svg>
                 </span>
                 <span>Annonces</span>
-                @php
-                    $pendingListings = \App\Models\Listing::where('status', 'pending')->count();
-                @endphp
-                @if($pendingListings > 0)
-                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $pendingListings }}</span>
+                @if($newAdminListingsCount > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $newAdminListingsCount }}</span>
                 @endif
             </a>
 
@@ -234,12 +265,8 @@
                     </svg>
                 </span>
                 <span>Utilisateurs</span>
-                @php
-                    $lastViewedUsers = cache('admin_viewed_users_' . auth()->id(), now()->subYears(10));
-                    $newUsersCount = \App\Models\User::where('created_at', '>', $lastViewedUsers)->count();
-                @endphp
-                @if($newUsersCount > 0)
-                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $newUsersCount }}</span>
+                @if($newAdminUsersCount > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $newAdminUsersCount }}</span>
                 @endif
             </a>
 
@@ -251,11 +278,8 @@
                     </svg>
                 </span>
                 <span>Signalements</span>
-                @php
-                    $pendingReports = \App\Models\Report::where('status', 'pending')->count();
-                @endphp
-                @if($pendingReports > 0)
-                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $pendingReports }}</span>
+                @if($newAdminReportsCount > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $newAdminReportsCount }}</span>
                 @endif
             </a>
 
@@ -266,11 +290,8 @@
                     </svg>
                 </span>
                 <span>Messages</span>
-                @php
-                    $unreadAdminMessages = \App\Models\Message::where('is_read', false)->whereNull('receiver_id')->count();
-                @endphp
-                @if($unreadAdminMessages > 0)
-                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $unreadAdminMessages }}</span>
+                @if($newAdminMessagesCount > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $newAdminMessagesCount }}</span>
                 @endif
             </a>
 
@@ -281,11 +302,8 @@
                     </svg>
                 </span>
                 <span>Sponsorisations</span>
-                @php
-                    $pendingSponsors = \App\Models\Sponsorship::where('status', 'pending')->count();
-                @endphp
-                @if($pendingSponsors > 0)
-                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $pendingSponsors }}</span>
+                @if($newAdminSponsorsCount > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $newAdminSponsorsCount }}</span>
                 @endif
             </a>
 
@@ -296,13 +314,8 @@
                     </svg>
                 </span>
                 <span>Abonnements</span>
-                @php
-                    $lastViewedSubs = cache('admin_viewed_subs_' . auth()->id(), now()->subYears(10));
-                    // Check for new payments/subscriptions created since last view
-                    $newSubsCount = \App\Models\Payment::where('created_at', '>', $lastViewedSubs)->count();
-                @endphp
-                @if($newSubsCount > 0)
-                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $newSubsCount }}</span>
+                @if($newAdminSubscriptionsCount > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $newAdminSubscriptionsCount }}</span>
                 @endif
             </a>
 
@@ -314,11 +327,8 @@
                     </svg>
                 </span>
                 <span>Paiements</span>
-                @php
-                    $pendingPayments = \App\Models\Payment::where('status', 'pending')->count();
-                @endphp
-                @if($pendingPayments > 0)
-                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $pendingPayments }}</span>
+                @if($newAdminPaymentsCount > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $newAdminPaymentsCount }}</span>
                 @endif
             </a>
 
@@ -329,12 +339,8 @@
                     </svg>
                 </span>
                 <span>Estimations</span>
-                @php
-                    $lastViewedEstimations = cache('admin_viewed_estimations_' . auth()->id(), now()->subYears(10));
-                    $estimCount = \App\Models\Estimation::whereNotNull('contact_email')->where('created_at', '>', $lastViewedEstimations)->count();
-                @endphp
-                @if($estimCount > 0)
-                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $estimCount }}</span>
+                @if($newAdminEstimationsCount > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $newAdminEstimationsCount }}</span>
                 @endif
             </a>
 
@@ -378,6 +384,7 @@
                 </button>
             </form>
         </div>
+        </div>
     </aside>
 
     <div class="admin-main flex-1 flex flex-col h-screen overflow-y-auto min-w-0 w-full">
@@ -399,7 +406,7 @@
                 </div>
 
                 <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                    @yield('top_actions')
+                    <div id="admin-top-actions">@yield('top_actions')</div>
                     
                     {{-- Chrono (Horloge en temps réel) --}}
                     <div class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl panel text-sm font-medium transition duration-300" 
@@ -627,25 +634,24 @@
                             }
                         }
                         
-                        // Update active nav state
-                        document.querySelectorAll('.nav-ajax').forEach(link => {
-                            link.classList.remove('active');
-                            const href = link.getAttribute('href');
-                            if (url.includes(href) || link.closest('[data-route-match]')) {
-                                const routePattern = link.getAttribute('data-route-pattern');
-                                if (routePattern) {
-                                    if (url.includes(routePattern)) {
-                                        link.classList.add('active');
-                                        const badge = link.querySelector('.nav-badge');
-                                        if (badge) badge.style.display = 'none';
-                                    }
-                                } else if (href && url.includes(href)) {
-                                    link.classList.add('active');
-                                    const badge = link.querySelector('.nav-badge');
-                                    if (badge) badge.style.display = 'none';
-                                }
-                            }
+                        // Update sidebar badges and header actions from the new response
+                        const newSidebarContent = doc.getElementById('admin-sidebar-content');
+                        const currentSidebarContent = document.getElementById('admin-sidebar-content');
+                        if (newSidebarContent && currentSidebarContent) {
+                            currentSidebarContent.innerHTML = newSidebarContent.innerHTML;
+                        }
+
+                        const newTopActions = doc.getElementById('admin-top-actions');
+                        const currentTopActions = document.getElementById('admin-top-actions');
+                        if (currentTopActions) {
+                            currentTopActions.innerHTML = newTopActions ? newTopActions.innerHTML : '';
+                        }
+
+                        document.querySelectorAll('.nav-ajax.active .nav-badge').forEach(badge => {
+                            badge.style.display = 'none';
                         });
+
+                        this.mobileSidebarOpen = false;
                         
                         // Push to history
                         if (pushState) {
@@ -672,12 +678,17 @@
                 }
             },
             reinitScripts() {
-                // Re-initialize Alpine components in the new content
-                const mainContent = document.getElementById('admin-main-content');
-                if (mainContent && window.Alpine) {
-                    mainContent.querySelectorAll('[x-data]:not([x-initialized])').forEach(el => {
-                        el.setAttribute('x-initialized', 'true');
-                        Alpine.initTree(el);
+                const containers = [
+                    document.getElementById('admin-main-content'),
+                    document.getElementById('admin-sidebar-content'),
+                    document.getElementById('admin-top-actions')
+                ];
+
+                if (window.Alpine) {
+                    containers.filter(Boolean).forEach(container => {
+                        container.querySelectorAll('[x-data]').forEach(el => {
+                            Alpine.initTree(el);
+                        });
                     });
                 }
             }

@@ -183,6 +183,26 @@
             </div>
         </div>
 
+        @php
+            $userSidebarId = auth()->id();
+
+            if ($userSidebarId) {
+                if (request()->routeIs('user.messages.*')) cache()->put('user_viewed_messages_' . $userSidebarId, now());
+                if (request()->routeIs('user.notifications*')) cache()->put('user_viewed_notifications_' . $userSidebarId, now());
+            }
+
+            $userLastViewedMessages = cache('user_viewed_messages_' . $userSidebarId, now()->subYears(10));
+            $userLastViewedNotifications = cache('user_viewed_notifications_' . $userSidebarId, now()->subYears(10));
+            $newUserMessagesCount = \App\Models\Message::where('receiver_id', $userSidebarId)
+                ->where('status', 'approved')
+                ->where('created_at', '>', $userLastViewedMessages)
+                ->count();
+            $newUserNotificationsCount = \DB::table('user_notifications')
+                ->where('user_id', $userSidebarId)
+                ->where('created_at', '>', $userLastViewedNotifications)
+                ->count();
+        @endphp
+
         <nav class="flex-1 px-4 py-5 space-y-1.5">
             @if(!auth()->user()->isClient())
             <div class="text-[11px] uppercase tracking-[0.22em] px-2 pb-2" style="color: var(--text-soft)">Vue Générale</div>
@@ -219,11 +239,8 @@
                     </svg>
                 </span>
                 <span>Messages</span>
-                @php
-                    $unreadMessages = \App\Models\Message::where('receiver_id', auth()->id())->where('is_read', false)->count();
-                @endphp
-                @if($unreadMessages > 0)
-                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $unreadMessages }}</span>
+                @if($newUserMessagesCount > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $newUserMessagesCount }}</span>
                 @endif
             </a>
 
@@ -245,14 +262,8 @@
                     </svg>
                 </span>
                 <span>Notifications</span>
-                @php
-                    $unreadNotifications = \DB::table('user_notifications')
-                        ->where('user_id', auth()->id())
-                        ->where('read', false)
-                        ->count();
-                @endphp
-                @if($unreadNotifications > 0)
-                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $unreadNotifications }}</span>
+                @if($newUserNotificationsCount > 0)
+                <span class="nav-badge ml-auto text-xs bg-gold/20 text-gold-dark font-semibold rounded-full px-2 py-0.5">{{ $newUserNotificationsCount }}</span>
                 @endif
             </a>
             @endif
