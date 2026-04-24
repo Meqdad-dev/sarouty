@@ -354,19 +354,33 @@
                         </div>
                     @endif
 
-                    <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl cursor-pointer hover:border-gold/50 hover:bg-gold/5 transition-all text-center px-4">
+                    <input x-ref="imagesInput" type="file" name="images[]" multiple accept="image/*" class="hidden" @change="previewImages($event)">
+
+                    <div class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-gold/50 hover:bg-gold/5 transition-all text-center px-4"
+                         @dragover.prevent
+                         @drop.prevent="handleDroppedFiles($event)">
                         <svg class="w-10 h-10 text-gray-400 dark:text-gray-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Cliquez ou déposez vos nouvelles photos</span>
                         <span class="text-xs text-gray-400 dark:text-gray-500 mt-1">JPG, PNG, WebP · Aucune limite de nombre</span>
-                        <input type="file" name="images[]" multiple accept="image/*" class="sr-only" @change="previewImages($event)">
-                    </label>
+                        <button type="button" @click.prevent="openFilePicker()" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-gold px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gold-dark transition-colors">
+                            Choisir des photos
+                        </button>
+                    </div>
+
+                    <div class="mt-4 flex gap-2">
+                        <input type="url" x-model="tempUrl" @keydown.enter.prevent="addUrlAsPreview()" placeholder="Ou coller l'URL d'une image (ex: https://...)" class="flex-1 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
+                        <button type="button" @click="addUrlAsPreview()" :disabled="!tempUrl" class="px-5 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50">Ajouter</button>
+                    </div>
 
                     <div x-show="previews.length > 0" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-                        <template x-for="(src, i) in previews" :key="i">
+                        <template x-for="(item, i) in previews" :key="`${item.type}-${item.src}-${i}`">
                             <div class="relative aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
-                                <img :src="src" class="w-full h-full object-cover">
+                                <img :src="item.src" class="w-full h-full object-cover">
+                                <template x-if="item.type === 'url'">
+                                    <input type="hidden" name="image_urls[]" :value="item.src">
+                                </template>
                                 <button type="button" @click="removePreview(i)"
                                         class="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full text-sm flex items-center justify-center hover:bg-red-600 shadow-sm transition-colors transform hover:scale-110">
                                     ×
@@ -505,7 +519,9 @@ function adminListingForm() {
         },
         geoLoading: false,
         geoMessage: '',
-        previews: [],
+        previews: @js(collect(old('image_urls', []))->map(fn ($url) => ['type' => 'url', 'src' => $url])->values()),
+        selectedFiles: [],
+        tempUrl: '',
         map: null,
         marker: null,
 
@@ -605,17 +621,81 @@ function adminListingForm() {
             }
         },
 
+        openFilePicker() {
+            this.$refs.imagesInput?.click();
+        },
+
+        handleDroppedFiles(event) {
+            if (!event.dataTransfer?.files?.length) return;
+            this.loadSelectedFiles(event.dataTransfer.files);
+        },
+
         previewImages(event) {
-            const files = Array.from(event.target.files);
+            this.loadSelectedFiles(event.target.files);
+        },
+
+        loadSelectedFiles(fileList) {
+            const files = Array.from(fileList || []);
+
             files.forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+
+                this.selectedFiles.push(file);
+
                 const reader = new FileReader();
-                reader.onload = (e) => this.previews.push(e.target.result);
+                reader.onload = (e) => this.previews.push({
+                    type: 'file',
+                    src: e.target.result,
+                    name: file.name,
+                    size: file.size,
+                    lastModified: file.lastModified,
+                });
                 reader.readAsDataURL(file);
             });
+
+            this.syncFileInput();
+        },
+
+        syncFileInput() {
+            if (!this.$refs.imagesInput) return;
+            const dataTransfer = new DataTransfer();
+            this.selectedFiles.forEach(file => dataTransfer.items.add(file));
+            this.$refs.imagesInput.files = dataTransfer.files;
         },
 
         removePreview(i) {
+            const item = this.previews[i];
+            if (!item) return;
+
+            if (item.type === 'file') {
+                const fileIndex = this.selectedFiles.findIndex(file =>
+                    file.name === item.name &&
+                    file.size === item.size &&
+                    file.lastModified === item.lastModified
+                );
+
+                if (fileIndex !== -1) {
+                    this.selectedFiles.splice(fileIndex, 1);
+                    this.syncFileInput();
+                }
+            }
+
             this.previews.splice(i, 1);
+        },
+
+        addUrlAsPreview() {
+            const url = this.tempUrl.trim();
+            if (!url) return;
+
+            try {
+                new URL(url);
+            } catch (_) {
+                alert('Veuillez saisir une URL d\'image valide.');
+                return;
+            }
+
+            this.previews.push({ type: 'url', src: url });
+            this.tempUrl = '';
         },
     };
 }

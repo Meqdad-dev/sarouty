@@ -320,7 +320,12 @@ class AdminController extends Controller
             'priority'         => 'nullable|integer|min:0|max:10',
             'images'           => 'nullable|array',
             'images.*'         => 'image|mimes:jpg,jpeg,png,webp|max:10240',
+            'image_urls'       => 'nullable|array',
+            'image_urls.*'     => 'url',
         ]);
+
+        $imageUrls = $validated['image_urls'] ?? [];
+        unset($validated['image_urls']);
 
         $listing = Listing::create($validated);
 
@@ -330,6 +335,27 @@ class AdminController extends Controller
                 $listing->images()->create(['path' => $path, 'order' => $i]);
                 if ($i === 0) {
                     $listing->update(['thumbnail' => $path]);
+                }
+            }
+        }
+
+        if (!empty($imageUrls)) {
+            $order = $listing->images()->max('order') ?? -1;
+
+            foreach ($imageUrls as $url) {
+                try {
+                    $path = $this->media->uploadFromUrl($url, "listings/{$listing->id}");
+
+                    if ($path) {
+                        $order++;
+                        $listing->images()->create(['path' => $path, 'order' => $order]);
+
+                        if (empty($listing->thumbnail)) {
+                            $listing->update(['thumbnail' => $path]);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    // Ignore URL download failures and continue with the others.
                 }
             }
         }
@@ -386,9 +412,14 @@ class AdminController extends Controller
             'priority'         => 'nullable|integer|min:0|max:10',
             'images'           => 'nullable|array',
             'images.*'         => 'image|mimes:jpg,jpeg,png,webp|max:10240',
+            'image_urls'       => 'nullable|array',
+            'image_urls.*'     => 'url',
             'delete_images'    => 'nullable|array',
             'delete_images.*'  => 'integer|exists:listing_images,id',
         ]);
+
+        $imageUrls = $validated['image_urls'] ?? [];
+        unset($validated['image_urls']);
 
         $listing->update($validated);
 
@@ -406,6 +437,23 @@ class AdminController extends Controller
                 $order = $startIndex + $i + 1;
                 $path = $this->media->uploadUploadedFile($image, "listings/{$listing->id}");
                 $listing->images()->create(['path' => $path, 'order' => $order]);
+            }
+        }
+
+        if (!empty($imageUrls)) {
+            $startIndex = $listing->images()->max('order') ?? -1;
+
+            foreach ($imageUrls as $url) {
+                try {
+                    $path = $this->media->uploadFromUrl($url, "listings/{$listing->id}");
+
+                    if ($path) {
+                        $startIndex++;
+                        $listing->images()->create(['path' => $path, 'order' => $startIndex]);
+                    }
+                } catch (\Exception $e) {
+                    // Ignore URL download failures and continue with the others.
+                }
             }
         }
 
