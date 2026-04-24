@@ -10,16 +10,18 @@ use App\Models\Message;
 use App\Models\Payment;
 use App\Jobs\NotifyListingApproved;
 use App\Services\AiService;
+use App\Services\MediaStorageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
-    public function __construct(protected AiService $ai)
-    {
+    public function __construct(
+        protected AiService $ai,
+        protected MediaStorageService $media,
+    ) {
         $this->middleware(['auth', 'role:admin']);
     }
 
@@ -142,9 +144,9 @@ class AdminController extends Controller
 
         if ($request->hasFile('avatar')) {
             if ($user->avatar) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
+                $this->media->delete($user->avatar);
             }
-            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+            $validated['avatar'] = $this->media->uploadUploadedFile($request->file('avatar'), 'avatars');
         }
 
         $user->update($validated);
@@ -266,7 +268,7 @@ class AdminController extends Controller
     public function listingDestroy(Listing $listing)
     {
         foreach ($listing->images as $img) {
-            Storage::disk('public')->delete($img->path);
+            $this->media->delete($img->path);
         }
         $listing->forceDelete();
 
@@ -324,7 +326,7 @@ class AdminController extends Controller
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $i => $image) {
-                $path = $image->store("listings/{$listing->id}", 'public');
+                $path = $this->media->uploadUploadedFile($image, "listings/{$listing->id}");
                 $listing->images()->create(['path' => $path, 'order' => $i]);
                 if ($i === 0) {
                     $listing->update(['thumbnail' => $path]);
@@ -393,7 +395,7 @@ class AdminController extends Controller
         if ($request->has('delete_images')) {
             $imagesToDelete = $listing->images()->whereIn('id', $request->delete_images)->get();
             foreach ($imagesToDelete as $img) {
-                Storage::disk('public')->delete($img->path);
+                $this->media->delete($img->path);
                 $img->delete();
             }
         }
@@ -402,7 +404,7 @@ class AdminController extends Controller
             $startIndex = $listing->images()->max('order') ?? -1;
             foreach ($request->file('images') as $i => $image) {
                 $order = $startIndex + $i + 1;
-                $path = $image->store("listings/{$listing->id}", 'public');
+                $path = $this->media->uploadUploadedFile($image, "listings/{$listing->id}");
                 $listing->images()->create(['path' => $path, 'order' => $order]);
             }
         }
@@ -577,7 +579,7 @@ class AdminController extends Controller
 
         foreach ($user->listings as $listing) {
             foreach ($listing->images as $img) {
-                Storage::disk('public')->delete($img->path);
+                $this->media->delete($img->path);
             }
         }
 
@@ -659,7 +661,7 @@ class AdminController extends Controller
 
         // Delete listing images
         foreach ($listing->images as $img) {
-            Storage::disk('public')->delete($img->path);
+            $this->media->delete($img->path);
         }
 
         $listingTitle = $listing->title;

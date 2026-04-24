@@ -133,7 +133,7 @@
                                         <div class="space-y-3">
                                             @if($setting->value)
                                                 <div class="flex items-center gap-4">
-                                                    <img src="{{ Storage::url($setting->value) }}" 
+                                                    <img src="{{ $setting->image_url }}" 
                                                          alt="{{ $setting->label }}"
                                                          class="h-16 rounded-lg border border-gray-200 dark:border-gray-600">
                                                     <button type="button"

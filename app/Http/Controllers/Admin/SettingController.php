@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\MediaStorageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
-    public function __construct()
+    public function __construct(protected MediaStorageService $media)
     {
         $this->middleware(['auth', 'role:admin']);
     }
@@ -48,12 +48,11 @@ class SettingController extends Controller
                 // Handle image upload
                 if ($request->hasFile($fieldKey)) {
                     $file = $request->file($fieldKey);
-                    $path = $file->store('settings', 'public');
-                    $value = $path;
-                    
+                    $value = $this->media->uploadUploadedFile($file, 'settings');
+
                     // Delete old image if exists
-                    if ($setting->value && Storage::disk('public')->exists($setting->value)) {
-                        Storage::disk('public')->delete($setting->value);
+                    if ($setting->value) {
+                        $this->media->delete($setting->value);
                     }
                 } else {
                     // Keep existing value

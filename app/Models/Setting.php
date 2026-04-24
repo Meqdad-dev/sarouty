@@ -130,4 +130,13 @@ class Setting extends Model
     {
         return static::castValue($this->value, $this->type);
     }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if ($this->type !== 'image' || blank($this->value)) {
+            return null;
+        }
+
+        return app(\App\Services\MediaStorageService::class)->url($this->value);
+    }
 }

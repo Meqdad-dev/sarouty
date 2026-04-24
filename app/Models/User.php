@@ -130,7 +130,7 @@ class User extends Authenticatable
     public function getAvatarUrlAttribute(): string
     {
         if ($this->avatar) {
-            return asset('storage/' . $this->avatar);
+            return app(\App\Services\MediaStorageService::class)->url($this->avatar) ?? '';
         }
         // Avatar généré via initiales
         $initials = collect(explode(' ', $this->name))

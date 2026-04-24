@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Services\MediaStorageService;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Str;
 
 class ListingImage extends Model
 {
@@ -17,8 +17,6 @@ class ListingImage extends Model
 
     public function getUrlAttribute(): string
     {
-        return Str::startsWith($this->path, ['http://', 'https://'])
-            ? $this->path
-            : asset('storage/' . $this->path);
+        return app(MediaStorageService::class)->url($this->path) ?? '';
     }
 }

@@ -9,10 +9,10 @@ use App\Models\Sponsorship;
 use App\Services\AiService;
 use App\Services\EmailService;
 use App\Services\GeoService;
+use App\Services\MediaStorageService;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
 
 class UserListingController extends Controller
 {
@@ -21,6 +21,7 @@ class UserListingController extends Controller
         protected EmailService $email,
         protected GeoService $geo,
         protected PaymentService $payments,
+        protected MediaStorageService $media,
     ) {
         $this->middleware('auth');
     }
@@ -91,9 +92,9 @@ class UserListingController extends Controller
 
         if ($request->hasFile('avatar')) {
             if ($user->avatar) {
-                Storage::disk('public')->delete($user->avatar);
+                $this->media->delete($user->avatar);
             }
-            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+            $validated['avatar'] = $this->media->uploadUploadedFile($request->file('avatar'), 'avatars');
         }
 
         $user->update($validated);
@@ -206,7 +207,7 @@ class UserListingController extends Controller
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 if ($order >= $maxImages) break;
-                $path = $image->store("listings/{$listing->id}", 'public');
+                $path = $this->media->uploadUploadedFile($image, "listings/{$listing->id}");
                 $listing->images()->create(['path' => $path, 'order' => $order]);
                 if ($order === 0) {
                     $listing->update(['thumbnail' => $path]);
@@ -219,18 +220,9 @@ class UserListingController extends Controller
             foreach ($request->image_urls as $url) {
                 if ($order >= $maxImages) break;
                 try {
-                    $response = \Illuminate\Support\Facades\Http::timeout(10)->get($url);
-                    if ($response->successful()) {
-                        // Attempt to extract extension from content type or url
-                        $ext = 'jpg';
-                        $contentType = $response->header('Content-Type');
-                        if (str_contains($contentType, 'png')) $ext = 'png';
-                        elseif (str_contains($contentType, 'webp')) $ext = 'webp';
+                    $path = $this->media->uploadFromUrl($url, "listings/{$listing->id}");
 
-                        $name = uniqid() . '.' . $ext;
-                        $path = "listings/{$listing->id}/" . $name;
-                        Storage::disk('public')->put($path, $response->body());
-                        
+                    if ($path) {
                         $listing->images()->create(['path' => $path, 'order' => $order]);
                         if ($order === 0) {
                             $listing->update(['thumbnail' => $path]);
@@ -343,7 +335,7 @@ class UserListingController extends Controller
         if ($request->has('delete_images')) {
             $imagesToDelete = $listing->images()->whereIn('id', $request->delete_images)->get();
             foreach ($imagesToDelete as $img) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($img->path);
+                $this->media->delete($img->path);
                 $img->delete();
             }
         }
@@ -360,7 +352,7 @@ class UserListingController extends Controller
                 if ($currentCount >= $maxImages) break;
                 
                 $currentMaxOrder++;
-                $path = $image->store("listings/{$listing->id}", 'public');
+                $path = $this->media->uploadUploadedFile($image, "listings/{$listing->id}");
                 $listing->images()->create([
                     'path' => $path,
                     'order' => $currentMaxOrder
@@ -386,7 +378,7 @@ class UserListingController extends Controller
         $this->authorize('delete', $listing);
 
         foreach ($listing->images as $img) {
-            Storage::disk('public')->delete($img->path);
+            $this->media->delete($img->path);
         }
 
         $listing->delete();

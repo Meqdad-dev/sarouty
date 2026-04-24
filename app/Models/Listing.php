@@ -244,16 +244,12 @@ class Listing extends Model
     public function getThumbnailUrlAttribute(): string
     {
         if ($this->thumbnail) {
-            return Str::startsWith($this->thumbnail, ['http://', 'https://'])
-                ? $this->thumbnail
-                : asset('storage/' . $this->thumbnail);
+            return app(\App\Services\MediaStorageService::class)->url($this->thumbnail) ?? '';
         }
 
         if ($this->images->isNotEmpty()) {
             $firstImage = $this->images->first()->path;
-            return Str::startsWith($firstImage, ['http://', 'https://'])
-                ? $firstImage
-                : asset('storage/' . $firstImage);
+            return app(\App\Services\MediaStorageService::class)->url($firstImage) ?? '';
         }
 
         return "data:image/svg+xml," . rawurlencode('<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1A1410"/><stop offset="100%" stop-color="#3D6B20"/></linearGradient></defs><rect width="1200" height="800" fill="url(#g)"/><circle cx="980" cy="160" r="110" fill="#C8963E" fill-opacity="0.18"/><path d="M220 470l180-150 130 110 170-150 220 190v130H220z" fill="#ffffff" fill-opacity="0.12"/><text x="90" y="655" fill="#F8F3E8" font-family="Arial, sans-serif" font-size="58" font-weight="700">Sarouty</text><text x="90" y="715" fill="#E8D9C0" font-family="Arial, sans-serif" font-size="28">Annonce en attente de visuel</text></svg>');

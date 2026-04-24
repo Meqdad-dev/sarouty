@@ -185,14 +185,14 @@
                     @foreach($listing->images->take(4) as $idx => $img)
                         @if($idx === 3 && $listing->images->count() > 4)
                             <div class="relative rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
-                                <img src="{{ asset('storage/' . $img->path) }}" class="w-full h-full object-cover">
+                                <img src="{{ $img->url }}" class="w-full h-full object-cover">
                                 <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
                                     <span class="text-white font-bold text-sm">+{{ $listing->images->count() - 3 }}</span>
                                 </div>
                             </div>
                         @else
                             <div class="{{ $idx === 0 && $listing->images->count() === 3 ? 'col-span-2' : '' }} {{ $idx === 0 && $listing->images->count() <= 2 ? 'col-span-2 h-full' : '' }} rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
-                                <img src="{{ asset('storage/' . $img->path) }}" class="w-full h-full object-cover">
+                                <img src="{{ $img->url }}" class="w-full h-full object-cover">
                             </div>
                         @endif
                     @endforeach
