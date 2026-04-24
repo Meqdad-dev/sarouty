@@ -421,12 +421,17 @@
                         ['name' => 'terrace',   'label' => 'Terrasse',    'icon' => '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707" stroke-width="2"/>'],
                         ['name' => 'security',  'label' => 'Gardiennage', 'icon' => '<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622" stroke-width="2"/>'],
                     ] as $feat)
-                        <label class="flex items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-gold/50 dark:hover:border-gold/50 cursor-pointer transition-colors group"
-                               :class="form.{{ $feat['name'] }} ? 'bg-gold/5 dark:bg-gold/10 border-gold/50 dark:border-gold/50' : ''">
+                        <button type="button"
+                                @click.prevent.stop="form.{{ $feat['name'] }} = !form.{{ $feat['name'] }}"
+                                :aria-pressed="form.{{ $feat['name'] }} ? 'true' : 'false'"
+                                class="relative flex w-full items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gold/50 dark:hover:border-gold/50 transition-colors group text-left"
+                                :class="form.{{ $feat['name'] }} ? 'bg-gold/5 dark:bg-gold/10 border-gold/50 dark:border-gold/50 ring-1 ring-gold/20' : ''">
                             <input type="checkbox" name="{{ $feat['name'] }}" value="1"
                                    x-model="form.{{ $feat['name'] }}"
                                    {{ old($feat['name'], ($listing->{$feat['name']} ?? false) ? '1' : '') ? 'checked' : '' }}
-                                   class="sr-only">
+                                   class="pointer-events-none absolute h-0 w-0 opacity-0"
+                                   tabindex="-1"
+                                   aria-hidden="true">
                             <div class="flex-shrink-0">
                                 <svg class="w-6 h-6 text-gold/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     {!! $feat['icon'] !!}
@@ -435,7 +440,7 @@
                             <span class="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors"
                                   :class="form.{{ $feat['name'] }} ? 'text-gray-900 dark:text-white' : ''">{{ $feat['label'] }}</span>
                             <span x-show="form.{{ $feat['name'] }}" class="ml-auto text-gold text-xs font-bold">✓</span>
-                        </label>
+                        </button>
                     @endforeach
                 </div>
             </div>

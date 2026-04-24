@@ -32,6 +32,7 @@
                     @php
                         $unreadMessages = \App\Models\Message::where('receiver_id', auth()->id())->where('status', 'approved')->where('is_read', false)->count();
                         $unreadNotifications = \DB::table('user_notifications')->where('user_id', auth()->id())->where('read', false)->count();
+                        $publishRoute = auth()->user()->isAdmin() ? route('admin.listings.create') : route('user.listings.create');
                     @endphp
                     
                     {{-- Messages Icon --}}
@@ -147,7 +148,7 @@
                     </div>
 
                     @if(!auth()->user()->isClient())
-                    <a href="{{ route('user.listings.create') }}"
+                    <a href="{{ $publishRoute }}"
                        class="bg-gold hover:bg-gold-dark text-white text-sm font-medium px-5 py-2 rounded-lg transition-colors flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -188,6 +189,7 @@
                 @php
                     $unreadMessagesMobile = \App\Models\Message::where('receiver_id', auth()->id())->where('status', 'approved')->where('is_read', false)->count();
                     $unreadNotificationsMobile = \DB::table('user_notifications')->where('user_id', auth()->id())->where('read', false)->count();
+                    $publishRouteMobile = auth()->user()->isAdmin() ? route('admin.listings.create') : route('user.listings.create');
                 @endphp
                 <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-ink hover:bg-sand rounded-lg">Mon tableau de bord</a>
                 <a href="{{ route('user.messages.index') }}" class="flex items-center justify-between px-4 py-2 text-sm text-ink hover:bg-sand rounded-lg">
@@ -204,7 +206,7 @@
                 </a>
                 <a href="{{ route('user.favorites') }}" class="block px-4 py-2 text-sm text-ink hover:bg-sand rounded-lg">Mes favoris</a>
                 @if(!auth()->user()->isClient())
-                <a href="{{ route('user.listings.create') }}" class="block mx-4 py-2 text-sm text-center bg-gold text-white rounded-lg">Publier une annonce</a>
+                <a href="{{ $publishRouteMobile }}" class="block mx-4 py-2 text-sm text-center bg-gold text-white rounded-lg">Publier une annonce</a>
                 @endif
             @else
                 <a href="{{ route('login') }}" class="block px-4 py-2 text-sm text-ink hover:bg-sand rounded-lg">Connexion</a>
