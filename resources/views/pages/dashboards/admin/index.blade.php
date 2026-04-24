@@ -254,8 +254,8 @@
             @else
                 <div class="space-y-3">
                     @foreach($pendingListings as $listing)
-                        <div class="flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group">
-                            <div class="w-14 h-14 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700 flex-shrink-0">
+                        <div class="admin-dashboard-list-item p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group">
+                            <div class="admin-dashboard-list-media rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-700">
                                 @if($listing->thumbnail_url)
                                     <img src="{{ $listing->thumbnail_url }}" alt="" class="w-full h-full object-cover">
                                 @else
@@ -266,7 +266,7 @@
                                     </div>
                                 @endif
                             </div>
-                            <div class="flex-1 min-w-0">
+                            <div class="admin-dashboard-list-content">
                                 <div class="font-medium text-gray-900 dark:text-white truncate">{{ $listing->title }}</div>
                                 <div class="flex items-center gap-2 mt-1 text-xs text-gray-500">
                                     <span>{{ $listing->city }}</span>
@@ -276,18 +276,18 @@
                                     <span>{{ $listing->created_at->diffForHumans() }}</span>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2 transition-opacity">
-                                <a href="{{ route('admin.listings.show', $listing) }}" class="nav-ajax p-2 rounded-lg bg-white dark:bg-gray-700 hover:bg-gold hover:text-white transition-colors shadow-sm" title="Voir">
+                            <div class="admin-dashboard-list-actions transition-opacity">
+                                <a href="{{ route('admin.listings.show', $listing) }}" class="nav-ajax admin-action-btn admin-action-btn--gold bg-white dark:bg-gray-700" title="Voir">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 </a>
                                 <form action="{{ route('admin.listings.approve', $listing) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="p-2 rounded-lg bg-white dark:bg-gray-700 hover:bg-emerald-500 hover:text-white transition-colors shadow-sm" title="Approuver">
+                                    <button type="submit" class="admin-action-btn admin-action-btn--success bg-white dark:bg-gray-700" title="Approuver">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                     </button>
                                 </form>
                             </div>
-                            <div class="flex flex-col items-end gap-2">
+                            <div class="admin-dashboard-list-badges">
                                 @if($listing->is_sponsored)
                                     <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-[11px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
                                         ⭐ Sponsorisée
@@ -410,7 +410,7 @@
                                 <h3 class="mt-3 font-semibold text-gray-900 dark:text-white line-clamp-2">{{ $listing->title }}</h3>
                                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ $listing->location_label ?: $listing->city }}</p>
                             </div>
-                            <a href="{{ route('admin.listings.show', $listing) }}" class="nav-ajax inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white text-gray-500 shadow-sm transition hover:bg-amber-500 hover:text-white dark:bg-gray-800" title="Voir">
+                            <a href="{{ route('admin.listings.show', $listing) }}" class="nav-ajax admin-action-btn admin-action-btn--gold bg-white dark:bg-gray-800" title="Voir">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             </a>
                         </div>

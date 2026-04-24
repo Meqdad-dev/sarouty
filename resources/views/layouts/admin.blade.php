@@ -185,17 +185,68 @@
             color: var(--nav-active-text);
             box-shadow: 0 16px 34px rgba(200,150,62,0.18);
         }
-        #admin-main-content :is(a, button)[class*="w-8"][class*="h-8"][class*="rounded-lg"][class*="border"] {
+        .admin-action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             width: 2.5rem;
             height: 2.5rem;
             border-radius: 0.95rem;
-            background: color-mix(in srgb, var(--panel-soft) 88%, transparent);
-            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+            border: 1px solid color-mix(in srgb, var(--border) 88%, transparent);
+            background: color-mix(in srgb, var(--panel-soft) 92%, transparent);
+            color: var(--text-soft);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
             transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease, color .2s ease;
         }
-        #admin-main-content :is(a, button)[class*="w-8"][class*="h-8"][class*="rounded-lg"][class*="border"]:hover {
+        .admin-action-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.14);
+        }
+        .admin-action-btn--neutral:hover {
+            color: var(--text);
+            border-color: rgba(148, 163, 184, 0.35);
+        }
+        .admin-action-btn--gold:hover {
+            color: #9B6E22;
+            border-color: rgba(200, 150, 62, 0.42);
+            background: rgba(200, 150, 62, 0.12);
+        }
+        .admin-action-btn--success:hover {
+            color: #059669;
+            border-color: rgba(16, 185, 129, 0.38);
+            background: rgba(16, 185, 129, 0.12);
+        }
+        .admin-action-btn--danger:hover {
+            color: #dc2626;
+            border-color: rgba(239, 68, 68, 0.35);
+            background: rgba(239, 68, 68, 0.12);
+        }
+        .admin-dashboard-list-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .admin-dashboard-list-media {
+            width: 3.5rem;
+            height: 3.5rem;
+            flex-shrink: 0;
+        }
+        .admin-dashboard-list-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .admin-dashboard-list-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+        .admin-dashboard-list-badges {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.5rem;
+            flex-shrink: 0;
         }
 
         ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -214,6 +265,7 @@
                 transition: transform .25s ease;
             }
             #admin-top-actions {
+                width: 100%;
                 justify-content: flex-start;
             }
             .admin-sidebar.open { transform: translateX(0); }
@@ -226,6 +278,48 @@
             .admin-main {
                 width: 100%;
                 max-width: 100vw;
+            }
+            .admin-dashboard-list-item {
+                flex-wrap: wrap;
+                align-items: flex-start;
+            }
+            .admin-dashboard-list-content,
+            .admin-dashboard-list-actions,
+            .admin-dashboard-list-badges {
+                width: 100%;
+            }
+            .admin-dashboard-list-actions {
+                justify-content: flex-end;
+            }
+            .admin-dashboard-list-badges {
+                flex-direction: row;
+                justify-content: flex-start;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 640px) {
+            #admin-top-actions > * {
+                flex: 1 1 calc(50% - 0.625rem);
+            }
+            #admin-top-actions :is(a, button) {
+                width: 100%;
+            }
+            .admin-dashboard-list-media {
+                width: 100%;
+                height: 10.5rem;
+                border-radius: 1rem;
+            }
+            .admin-dashboard-list-actions {
+                gap: 0.5rem;
+                justify-content: stretch;
+            }
+            .admin-dashboard-list-actions > * {
+                flex: 1 1 0;
+            }
+            .admin-dashboard-list-actions :is(a, button) {
+                width: 100%;
             }
         }
     </style>
@@ -259,26 +353,50 @@
 
         @php
             $adminSidebarUserId = auth()->id();
+            $resolveAdminSidebarTimestamp = function (string $key, bool $shouldMarkAsViewed = false) {
+                $timestamp = cache($key);
 
-            if ($adminSidebarUserId) {
-                if (request()->routeIs('admin.listings.*')) cache()->put('admin_viewed_listings_' . $adminSidebarUserId, now());
-                if (request()->routeIs('admin.users.*')) cache()->put('admin_viewed_users_' . $adminSidebarUserId, now());
-                if (request()->routeIs('admin.reports.*')) cache()->put('admin_viewed_reports_' . $adminSidebarUserId, now());
-                if (request()->routeIs('admin.messages.*')) cache()->put('admin_viewed_messages_' . $adminSidebarUserId, now());
-                if (request()->routeIs('admin.sponsorships.*')) cache()->put('admin_viewed_sponsors_' . $adminSidebarUserId, now());
-                if (request()->routeIs('admin.subscriptions.*')) cache()->put('admin_viewed_subs_' . $adminSidebarUserId, now());
-                if (request()->routeIs('admin.payments.*')) cache()->put('admin_viewed_payments_' . $adminSidebarUserId, now());
-                if (request()->routeIs('admin.estimations.*')) cache()->put('admin_viewed_estimations_' . $adminSidebarUserId, now());
-            }
+                // Au premier affichage, on initialise à maintenant pour éviter
+                // de compter tous les anciens enregistrements déjà existants.
+                if (!$timestamp) {
+                    $timestamp = now();
+                    cache()->forever($key, $timestamp);
+                }
 
-            $adminLastViewedListings = cache('admin_viewed_listings_' . $adminSidebarUserId, now()->subYears(10));
-            $adminLastViewedUsers = cache('admin_viewed_users_' . $adminSidebarUserId, now()->subYears(10));
-            $adminLastViewedReports = cache('admin_viewed_reports_' . $adminSidebarUserId, now()->subYears(10));
-            $adminLastViewedMessages = cache('admin_viewed_messages_' . $adminSidebarUserId, now()->subYears(10));
-            $adminLastViewedSponsors = cache('admin_viewed_sponsors_' . $adminSidebarUserId, now()->subYears(10));
-            $adminLastViewedSubs = cache('admin_viewed_subs_' . $adminSidebarUserId, now()->subYears(10));
-            $adminLastViewedPayments = cache('admin_viewed_payments_' . $adminSidebarUserId, now()->subYears(10));
-            $adminLastViewedEstimations = cache('admin_viewed_estimations_' . $adminSidebarUserId, now()->subYears(10));
+                if ($shouldMarkAsViewed) {
+                    $timestamp = now();
+                    cache()->forever($key, $timestamp);
+                }
+
+                return $timestamp instanceof \Carbon\CarbonInterface
+                    ? $timestamp
+                    : \Illuminate\Support\Carbon::parse($timestamp);
+            };
+
+            $adminLastViewedListings = $adminSidebarUserId
+                ? $resolveAdminSidebarTimestamp('admin_viewed_listings_' . $adminSidebarUserId, request()->routeIs('admin.listings.*'))
+                : now();
+            $adminLastViewedUsers = $adminSidebarUserId
+                ? $resolveAdminSidebarTimestamp('admin_viewed_users_' . $adminSidebarUserId, request()->routeIs('admin.users.*'))
+                : now();
+            $adminLastViewedReports = $adminSidebarUserId
+                ? $resolveAdminSidebarTimestamp('admin_viewed_reports_' . $adminSidebarUserId, request()->routeIs('admin.reports.*'))
+                : now();
+            $adminLastViewedMessages = $adminSidebarUserId
+                ? $resolveAdminSidebarTimestamp('admin_viewed_messages_' . $adminSidebarUserId, request()->routeIs('admin.messages.*'))
+                : now();
+            $adminLastViewedSponsors = $adminSidebarUserId
+                ? $resolveAdminSidebarTimestamp('admin_viewed_sponsors_' . $adminSidebarUserId, request()->routeIs('admin.sponsorships.*'))
+                : now();
+            $adminLastViewedSubs = $adminSidebarUserId
+                ? $resolveAdminSidebarTimestamp('admin_viewed_subs_' . $adminSidebarUserId, request()->routeIs('admin.subscriptions.*'))
+                : now();
+            $adminLastViewedPayments = $adminSidebarUserId
+                ? $resolveAdminSidebarTimestamp('admin_viewed_payments_' . $adminSidebarUserId, request()->routeIs('admin.payments.*'))
+                : now();
+            $adminLastViewedEstimations = $adminSidebarUserId
+                ? $resolveAdminSidebarTimestamp('admin_viewed_estimations_' . $adminSidebarUserId, request()->routeIs('admin.estimations.*'))
+                : now();
 
             $newAdminListingsCount = \App\Models\Listing::where('created_at', '>', $adminLastViewedListings)->count();
             $newAdminUsersCount = \App\Models\User::where('created_at', '>', $adminLastViewedUsers)->count();

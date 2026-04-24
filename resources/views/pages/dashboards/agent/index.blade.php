@@ -90,9 +90,9 @@
                 @else
                     <div class="divide-y divide-gray-100 dark:divide-gray-800">
                         @foreach($listings as $listing)
-                            <div class="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
+                            <div class="dashboard-list-row px-4 sm:px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
                                 {{-- Image --}}
-                                <div class="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700 shadow-sm">
+                                <div class="dashboard-list-media rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-sm">
                                     @if($listing->thumbnail_url)
                                         <img src="{{ $listing->thumbnail_url }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
                                     @else
@@ -105,7 +105,7 @@
                                 </div>
 
                                 {{-- Info --}}
-                                <div class="flex-1 min-w-0">
+                                <div class="dashboard-list-body">
                                     <h3 class="font-medium text-gold text-sm truncate group-hover:text-gold-dark transition-colors">@if($listing->isCurrentlySponsored())⭐ @endif{{ $listing->title }}</h3>
                                     <div class="flex flex-wrap items-center gap-2 mt-1">
                                         <span class="text-xs text-gray-500 flex items-center gap-1">
@@ -123,7 +123,7 @@
                                 </div>
 
                                 {{-- Statut --}}
-                                <div class="flex-shrink-0 hidden sm:flex items-center gap-2">
+                                <div class="dashboard-list-status">
                                     @if($listing->isCurrentlySponsored())
                                         <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
@@ -145,22 +145,22 @@
                                 </div>
 
                                 {{-- Actions --}}
-                                <div class="flex gap-1.5 flex-shrink-0 lg:opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div class="dashboard-list-actions lg:opacity-0 group-hover:opacity-100 transition-opacity">
                                     <a href="{{ route('user.listings.show', $listing) }}"
-                                       class="p-2 text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" title="Voir">
+                                       class="action-icon-btn action-icon-btn--neutral" title="Voir">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                         </svg>
                                     </a>
                                     <a href="{{ route('user.listings.edit', $listing) }}"
-                                       class="p-2 text-gray-400 hover:text-gold hover:bg-gold/10 rounded-lg transition-colors" title="Modifier">
+                                       class="action-icon-btn action-icon-btn--gold" title="Modifier">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                         </svg>
                                     </a>
                                     @if($canCreateSponsoredListing && !$listing->isCurrentlySponsored())
                                         <a href="{{ route('user.listings.edit', ['listing' => $listing, 'sponsored' => 1]) }}"
-                                           class="p-2 text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-colors" title="Sponsored">
+                                           class="action-icon-btn action-icon-btn--amber" title="Sponsored">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                                             </svg>
@@ -170,7 +170,7 @@
                                           onsubmit="return confirm('Supprimer cette annonce ?')">
                                         @csrf @method('DELETE')
                                         <button type="submit" title="Supprimer"
-                                                class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                                                class="action-icon-btn action-icon-btn--danger">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                             </svg>

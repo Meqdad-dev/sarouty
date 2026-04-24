@@ -133,6 +133,82 @@
             border: 1px solid var(--border);
             flex-shrink: 0;
         }
+        #user-top-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        #user-top-actions > * {
+            flex-shrink: 0;
+        }
+        .action-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.9rem;
+            border: 1px solid color-mix(in srgb, var(--border) 88%, transparent);
+            background: color-mix(in srgb, var(--panel-soft) 92%, transparent);
+            color: var(--text-soft);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease, color .2s ease;
+        }
+        .action-icon-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.14);
+        }
+        .action-icon-btn--neutral:hover {
+            color: var(--text);
+            border-color: rgba(148, 163, 184, 0.35);
+        }
+        .action-icon-btn--gold:hover {
+            color: #9B6E22;
+            border-color: rgba(200, 150, 62, 0.42);
+            background: rgba(200, 150, 62, 0.12);
+        }
+        .action-icon-btn--amber {
+            color: #d97706;
+        }
+        .action-icon-btn--amber:hover {
+            color: #b45309;
+            border-color: rgba(245, 158, 11, 0.38);
+            background: rgba(245, 158, 11, 0.12);
+        }
+        .action-icon-btn--danger:hover {
+            color: #dc2626;
+            border-color: rgba(239, 68, 68, 0.35);
+            background: rgba(239, 68, 68, 0.12);
+        }
+        .dashboard-list-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .dashboard-list-media {
+            width: 4rem;
+            height: 3rem;
+            flex-shrink: 0;
+        }
+        .dashboard-list-body {
+            flex: 1;
+            min-width: 0;
+        }
+        .dashboard-list-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        .dashboard-list-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            flex-shrink: 0;
+        }
         
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-thumb { background: rgba(148,163,184,.45); border-radius: 999px; }
@@ -159,6 +235,47 @@
             .admin-main {
                 width: 100%;
                 max-width: 100vw;
+            }
+            #user-top-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .dashboard-list-row {
+                flex-wrap: wrap;
+                align-items: flex-start;
+            }
+            .dashboard-list-body,
+            .dashboard-list-status,
+            .dashboard-list-actions {
+                width: 100%;
+            }
+            .dashboard-list-actions {
+                justify-content: flex-end;
+            }
+        }
+
+        @media (max-width: 640px) {
+            #user-top-actions > * {
+                flex: 1 1 calc(50% - 0.75rem);
+            }
+            #user-top-actions :is(a, button) {
+                width: 100%;
+                justify-content: center;
+            }
+            .dashboard-list-media {
+                width: 100%;
+                height: 10.5rem;
+                border-radius: 1rem;
+            }
+            .dashboard-list-actions {
+                gap: 0.5rem;
+                justify-content: stretch;
+            }
+            .dashboard-list-actions > * {
+                flex: 1 1 0;
+            }
+            .dashboard-list-actions :is(a, button) {
+                width: 100%;
             }
         }
     </style>
@@ -192,14 +309,33 @@
 
         @php
             $userSidebarId = auth()->id();
+            $resolveUserSidebarTimestamp = function (string $key, bool $shouldMarkAsViewed = false) {
+                $timestamp = cache($key);
 
-            if ($userSidebarId) {
-                if (request()->routeIs('user.messages.*')) cache()->put('user_viewed_messages_' . $userSidebarId, now());
-                if (request()->routeIs('user.notifications*')) cache()->put('user_viewed_notifications_' . $userSidebarId, now());
-            }
+                // On initialise le premier affichage à maintenant pour ne pas
+                // afficher comme "nouveaux" les anciens éléments déjà présents.
+                if (!$timestamp) {
+                    $timestamp = now();
+                    cache()->forever($key, $timestamp);
+                }
 
-            $userLastViewedMessages = cache('user_viewed_messages_' . $userSidebarId, now()->subYears(10));
-            $userLastViewedNotifications = cache('user_viewed_notifications_' . $userSidebarId, now()->subYears(10));
+                if ($shouldMarkAsViewed) {
+                    $timestamp = now();
+                    cache()->forever($key, $timestamp);
+                }
+
+                return $timestamp instanceof \Carbon\CarbonInterface
+                    ? $timestamp
+                    : \Illuminate\Support\Carbon::parse($timestamp);
+            };
+
+            $userLastViewedMessages = $userSidebarId
+                ? $resolveUserSidebarTimestamp('user_viewed_messages_' . $userSidebarId, request()->routeIs('user.messages.*'))
+                : now();
+            $userLastViewedNotifications = $userSidebarId
+                ? $resolveUserSidebarTimestamp('user_viewed_notifications_' . $userSidebarId, request()->routeIs('user.notifications*'))
+                : now();
+
             $newUserMessagesCount = \App\Models\Message::where('receiver_id', $userSidebarId)
                 ->where('status', 'approved')
                 ->where('created_at', '>', $userLastViewedMessages)
@@ -346,7 +482,7 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                <div id="user-top-actions" class="flex flex-wrap items-center gap-2 sm:gap-3 flex-shrink-0">
                     @yield('top_actions')
                     <button type="button"
                             @click="toggleTheme()"
