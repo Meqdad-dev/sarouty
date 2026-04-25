@@ -52,7 +52,7 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         if ($user->isClient()) {
-            return redirect()->route('user.favorites')
+            return redirect()->route('home')
                 ->with('success', "Bienvenue sur Sarouty, {$user->name} ! Votre compte a été créé avec succès.");
         }
 
