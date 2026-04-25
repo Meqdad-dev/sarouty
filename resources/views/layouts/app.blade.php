@@ -56,16 +56,58 @@
 </head>
 <body class="antialiased">
 
-    {{-- Spinner de transition global --}}
-    <div id="page-transition-spinner" class="fixed inset-0 z-[9999] bg-sand flex flex-col items-center justify-center transition-opacity duration-300 hidden opacity-0">
-        <div class="relative w-24 h-24 flex items-center justify-center mb-4">
-            <svg class="absolute inset-0 w-full h-full text-gold animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
-                <path class="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    {{-- Spinner de transition global dynamique (Clé et Maison) --}}
+    <style>
+        .sarouty-loader .key-icon {
+            animation: keyUnlock 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            /* Le point d'origine tourne autour de la boucle de la clé (en haut à droite dans ce svg) */
+            transform-origin: 80% 20%; 
+        }
+        .sarouty-loader .house-icon {
+            animation: houseReact 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sarouty-loader .glow-circle {
+            animation: glowPulse 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes keyUnlock {
+            0% { transform: translate(30px, 15px) rotate(45deg) scale(0); opacity: 0; }
+            25% { transform: translate(5px, 0px) rotate(45deg) scale(1); opacity: 1; }
+            45% { transform: translate(0px, 0px) rotate(0deg); opacity: 1; }
+            55% { transform: translate(0px, 0px) rotate(-90deg); opacity: 1; } /* La clé tourne */
+            75% { transform: translate(15px, 5px) rotate(0deg) scale(1.1); opacity: 1; }
+            100% { transform: translate(30px, 15px) rotate(45deg) scale(0); opacity: 0; }
+        }
+
+        @keyframes houseReact {
+            0%, 45% { transform: scale(1); color: #1A1410; } /* Couleur ink */
+            55%, 65% { transform: scale(1.15); color: #C8963E; } /* S'illumine en or */
+            100% { transform: scale(1); color: #1A1410; }
+        }
+        
+        @keyframes glowPulse {
+            0%, 45% { transform: scale(0.5); opacity: 0; }
+            55% { transform: scale(1.5); opacity: 0.3; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+    </style>
+
+    <div id="page-transition-spinner" class="fixed inset-0 z-[9999] bg-sand flex flex-col items-center justify-center transition-opacity duration-300 hidden opacity-0 sarouty-loader">
+        <div class="relative w-32 h-32 flex items-center justify-center mb-6">
+            <!-- Effet de lumière quand la porte s'ouvre -->
+            <div class="absolute w-20 h-20 bg-gold rounded-full glow-circle"></div>
+            
+            <!-- Maison -->
+            <svg class="w-16 h-16 house-icon relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
             </svg>
-            <span class="font-display font-bold text-3xl text-ink absolute">S</span>
+            
+            <!-- Clé -->
+            <svg class="w-12 h-12 text-gold absolute key-icon z-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+            </svg>
         </div>
-        <div class="font-display text-gold font-bold text-xl tracking-[0.2em] animate-pulse">SAROUTY</div>
+        <div class="font-display text-gold font-bold text-2xl tracking-[0.2em] animate-pulse">SAROUTY</div>
     </div>
     
     <script>
