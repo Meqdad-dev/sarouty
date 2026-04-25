@@ -125,6 +125,21 @@ class User extends Authenticatable
         return $this->role === $roles;
     }
 
+    public function dashboardRouteName(): string
+    {
+        return $this->isAdmin() ? 'admin.dashboard' : 'user.dashboard';
+    }
+
+    public function dashboardRoute(): string
+    {
+        return route($this->dashboardRouteName());
+    }
+
+    public function dashboardLabel(): string
+    {
+        return $this->isAdmin() ? 'Tableau de bord admin' : 'Mon tableau de bord';
+    }
+
     // ─── Accesseurs ───────────────────────────────────────────────────────────
 
     public function getAvatarUrlAttribute(): string

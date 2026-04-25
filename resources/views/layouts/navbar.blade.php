@@ -30,9 +30,12 @@
             <div class="hidden md:flex items-center gap-3">
                 @auth
                     @php
+                        $currentUser = auth()->user();
                         $unreadMessages = \App\Models\Message::where('receiver_id', auth()->id())->where('status', 'approved')->where('is_read', false)->count();
                         $unreadNotifications = \DB::table('user_notifications')->where('user_id', auth()->id())->where('read', false)->count();
-                        $publishRoute = auth()->user()->isAdmin() ? route('admin.listings.create') : route('user.listings.create');
+                        $publishRoute = $currentUser->isAdmin() ? route('admin.listings.create') : route('user.listings.create');
+                        $dashboardRoute = $currentUser->dashboardRoute();
+                        $dashboardLabel = $currentUser->dashboardLabel();
                     @endphp
                     
                     {{-- Messages Icon --}}
@@ -77,23 +80,12 @@
                              x-transition:enter-end="opacity-100 scale-100"
                              class="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-sand/80 py-1 z-50">
 
-                            @if(auth()->user()->isAdmin())
-                                <a href="{{ route('admin.dashboard') }}"
-                                   class="flex items-center gap-2 px-4 py-2 text-sm text-ink hover:bg-sand transition-colors">
-                                    <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 0v10"/>
-                                    </svg>
-                                    Administration
-                                </a>
-                                <hr class="my-1 border-sand">
-                            @endif
-
-                            <a href="{{ route('user.dashboard') }}"
+                            <a href="{{ $dashboardRoute }}"
                                class="flex items-center gap-2 px-4 py-2 text-sm text-ink hover:bg-sand transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                                 </svg>
-                                Mon tableau de bord
+                                {{ $dashboardLabel }}
                             </a>
                             <a href="{{ route('user.messages.index') }}"
                                class="flex items-center justify-between px-4 py-2 text-sm text-ink hover:bg-sand transition-colors">
@@ -187,11 +179,14 @@
             <hr class="border-sand">
             @auth
                 @php
+                    $currentUserMobile = auth()->user();
                     $unreadMessagesMobile = \App\Models\Message::where('receiver_id', auth()->id())->where('status', 'approved')->where('is_read', false)->count();
                     $unreadNotificationsMobile = \DB::table('user_notifications')->where('user_id', auth()->id())->where('read', false)->count();
-                    $publishRouteMobile = auth()->user()->isAdmin() ? route('admin.listings.create') : route('user.listings.create');
+                    $publishRouteMobile = $currentUserMobile->isAdmin() ? route('admin.listings.create') : route('user.listings.create');
+                    $dashboardRouteMobile = $currentUserMobile->dashboardRoute();
+                    $dashboardLabelMobile = $currentUserMobile->dashboardLabel();
                 @endphp
-                <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-ink hover:bg-sand rounded-lg">Mon tableau de bord</a>
+                <a href="{{ $dashboardRouteMobile }}" class="block px-4 py-2 text-sm text-ink hover:bg-sand rounded-lg">{{ $dashboardLabelMobile }}</a>
                 <a href="{{ route('user.messages.index') }}" class="flex items-center justify-between px-4 py-2 text-sm text-ink hover:bg-sand rounded-lg">
                     <span>Messages</span>
                     @if($unreadMessagesMobile > 0)
