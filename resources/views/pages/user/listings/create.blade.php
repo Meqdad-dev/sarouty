@@ -166,7 +166,7 @@
                     </h3>
 
                     {{-- Pièces --}}
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pb-4 border-b border-gray-200 dark:border-gray-700" x-show="['appartement','villa','riad','bureau','local'].includes(form.property_type)">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pb-4 border-b border-gray-200 dark:border-gray-700" x-show="['appartement','villa','riad','bureau','commerce','maison','ferme'].includes(form.property_type)">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Pièces</label>
                             <input type="number" name="rooms" x-model="form.rooms"
@@ -291,8 +291,44 @@
                         </div>
                     </div>
 
-                    {{-- Bureau / Local : caractéristiques commerciales --}}
-                    <div x-show="['bureau','local','entrepot'].includes(form.property_type)" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {{-- Maison --}}
+                    <div x-show="form.property_type === 'maison'" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Salles de bain</label>
+                            <select name="bathrooms" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
+                                <option value="">—</option>
+                                @for($i = 1; $i <= 8; $i++)
+                                    <option value="{{ $i }}" {{ old('bathrooms', $listing->bathrooms ?? '') == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Étages / niveaux</label>
+                            <select name="floor" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
+                                <option value="">—</option>
+                                <option value="0" {{ old('floor', $listing->floor ?? '') == 0 ? 'selected' : '' }}>Plain-pied</option>
+                                @for($i = 1; $i <= 4; $i++)
+                                    <option value="{{ $i }}" {{ old('floor', $listing->floor ?? '') == $i ? 'selected' : '' }}>{{ $i }} niveau(x)</option>
+                                @endfor
+                            </select>
+                        </div>
+                    </div>
+
+                    {{-- Ferme --}}
+                    <div x-show="form.property_type === 'ferme'" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Salles de bain</label>
+                            <select name="bathrooms" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
+                                <option value="">—</option>
+                                @for($i = 1; $i <= 6; $i++)
+                                    <option value="{{ $i }}" {{ old('bathrooms', $listing->bathrooms ?? '') == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                    </div>
+
+                    {{-- Bureau / Commerce : caractéristiques professionnelles --}}
+                    <div x-show="['bureau','commerce'].includes(form.property_type)" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Étage</label>
                             <select name="floor" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
@@ -308,7 +344,7 @@
                             <input type="number" step="0.1" name="ceiling_height" value="{{ old('ceiling_height', $listing->ceiling_height ?? '') }}" placeholder="3.5" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Type de local</label>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Type d'espace</label>
                             <select name="commercial_type" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
                                 <option value="">—</option>
                                 <option value="open_space" {{ old('commercial_type', $listing->commercial_type ?? '') === 'open_space' ? 'selected' : '' }}>Open space</option>

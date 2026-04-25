@@ -204,21 +204,21 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                         {{-- Pièces --}}
-                        <div x-show="['appartement','villa','riad','bureau','local'].includes(form.property_type)">
+                        <div x-show="['appartement','villa','riad','bureau','commerce','maison','ferme'].includes(form.property_type)">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Pièces</label>
                             <input type="number" name="rooms" value="{{ old('rooms', $listing->rooms) }}" min="0"
                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-gold/50 focus:border-gold">
                         </div>
 
                         {{-- Salles de bain (Appartement, Villa, Riad) --}}
-                        <div x-show="['appartement','villa','riad'].includes(form.property_type)">
+                        <div x-show="['appartement','villa','riad','maison','ferme'].includes(form.property_type)">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Salles de bain</label>
                             <input type="number" name="bathrooms" value="{{ old('bathrooms', $listing->bathrooms) }}" min="0"
                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-gold/50 focus:border-gold">
                         </div>
 
                         {{-- Étage (Appartement, Bureau, Local) --}}
-                        <div x-show="['appartement','bureau','local','entrepot'].includes(form.property_type)">
+                        <div x-show="['appartement','villa','bureau','commerce','maison'].includes(form.property_type)">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Étage</label>
                             <input type="number" name="floor" value="{{ old('floor', $listing->floor) }}"
                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-gold/50 focus:border-gold">
@@ -287,16 +287,16 @@
                             </select>
                         </div>
 
-                        {{-- Hauteur sous plafond (Bureau/Local) --}}
-                        <div x-show="['bureau','local','entrepot'].includes(form.property_type)">
+                        {{-- Hauteur sous plafond (Bureau/Commerce) --}}
+                        <div x-show="['bureau','commerce'].includes(form.property_type)">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Hauteur sous plafond (m)</label>
                             <input type="number" step="0.1" name="ceiling_height" value="{{ old('ceiling_height', $listing->ceiling_height ?? '') }}" 
                                    class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold">
                         </div>
 
-                        {{-- Type de local --}}
-                        <div x-show="['bureau','local','entrepot'].includes(form.property_type)">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Type de local</label>
+                        {{-- Type d'espace professionnel --}}
+                        <div x-show="['bureau','commerce'].includes(form.property_type)">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Type d'espace</label>
                             <select name="commercial_type" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold">
                                 <option value="">—</option>
                                 <option value="open_space" {{ old('commercial_type', $listing->commercial_type ?? '') === 'open_space' ? 'selected' : '' }}>Open space</option>
