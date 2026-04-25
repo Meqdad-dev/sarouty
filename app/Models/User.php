@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -211,6 +213,22 @@ class User extends Authenticatable
             'ban_reason' => null,
             'is_active' => true,
         ]);
+    }
+
+    public function revokeActiveSessions(): void
+    {
+        if (config('session.driver') === 'database') {
+            $connection = config('session.connection');
+            $table = config('session.table', 'sessions');
+
+            DB::connection($connection)->table($table)
+                ->where('user_id', $this->getKey())
+                ->delete();
+        }
+
+        $this->forceFill([
+            'remember_token' => Str::random(60),
+        ])->saveQuietly();
     }
 
     public function getStatusLabelAttribute(): string

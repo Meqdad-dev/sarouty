@@ -620,6 +620,11 @@ class AdminController extends Controller
         }
 
         $user->update(['is_active' => !$user->is_active]);
+
+        if (! $user->is_active) {
+            $user->revokeActiveSessions();
+        }
+
         $action = $user->is_active ? 'activé' : 'désactivé';
         Cache::forget('admin_dashboard_stats');
 
@@ -637,6 +642,7 @@ class AdminController extends Controller
         ]);
 
         $user->ban($request->ban_reason);
+        $user->revokeActiveSessions();
         Cache::forget('admin_dashboard_stats');
 
         return back()->with('success', "L'utilisateur {$user->name} a été banni.");
@@ -662,6 +668,7 @@ class AdminController extends Controller
             }
         }
 
+        $user->revokeActiveSessions();
         $user->delete();
         Cache::forget('admin_dashboard_stats');
 
@@ -768,6 +775,7 @@ class AdminController extends Controller
         
         // Ban the user
         $user->ban("Annonce signalée: {$report->reason_label}");
+        $user->revokeActiveSessions();
         
         // Mark report as resolved
         $report->update(['status' => 'resolved']);
