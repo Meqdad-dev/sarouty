@@ -19,7 +19,7 @@
 @section('content')
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <div x-data="adminListingForm()" x-init="init()">
-    <form action="{{ $listing->exists ? route('admin.listings.update', $listing) : route('admin.listings.store') }}" method="POST" enctype="multipart/form-data">
+    <form x-ref="listingForm" action="{{ $listing->exists ? route('admin.listings.update', $listing) : route('admin.listings.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         @if($listing->exists) @method('PUT') @endif
 
@@ -50,7 +50,7 @@
                         {{-- Title --}}
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Titre de l'annonce <span class="text-red-500">*</span></label>
-                            <input type="text" name="title" value="{{ old('title', $listing->title) }}" required maxlength="255"
+                            <input type="text" name="title" x-model="form.title" value="{{ old('title', $listing->title) }}" required maxlength="255"
                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-gold/50 focus:border-gold"
                                    placeholder="Ex: Villa moderne avec piscine à Marrakech">
                             @error('title') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
@@ -58,10 +58,24 @@
 
                         {{-- Description --}}
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Description <span class="text-red-500">*</span></label>
-                            <textarea name="description" rows="5" required minlength="20"
+                            <div class="mb-1.5 flex items-center justify-between gap-3">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description <span class="text-red-500">*</span></label>
+                                <button type="button" @click="generateDescription()" :disabled="aiLoading || !form.title || !form.property_type || !form.transaction_type"
+                                        class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-indigo-500 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:from-violet-600 hover:to-indigo-600 disabled:cursor-not-allowed disabled:opacity-50">
+                                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" :class="aiLoading ? 'animate-spin' : ''">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                    </svg>
+                                    <span x-text="aiLoading ? 'Génération...' : 'Générer avec l\'IA'"></span>
+                                </button>
+                            </div>
+                            <p x-show="!form.title || !form.property_type || !form.transaction_type" class="mb-2 text-xs text-amber-600 dark:text-amber-400">
+                                Renseignez au minimum le titre, le type de bien et le type de transaction pour laisser l'IA rédiger la description.
+                            </p>
+                            <textarea name="description" x-model="form.description" rows="5" required minlength="20"
                                       class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-gold/50 focus:border-gold resize-none"
+                                      :class="aiLoading ? 'border-violet-300 bg-violet-50/60 dark:border-violet-700 dark:bg-violet-950/20' : ''"
                                       placeholder="Décrivez votre bien en détail...">{{ old('description', $listing->description) }}</textarea>
+                            <div x-show="aiError" class="mt-2 text-sm text-red-500" x-text="aiError"></div>
                             @error('description') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
 
@@ -508,6 +522,8 @@
 function adminListingForm() {
     return {
         form: {
+            title: '{{ old("title", $listing->title ?? "") }}',
+            description: @js(old('description', $listing->description ?? '')),
             transaction_type: '{{ old("transaction_type", $listing->transaction_type ?? "") }}',
             property_type: '{{ old("property_type", $listing->property_type ?? "") }}',
             price_period: '{{ old("price_period", $listing->price_period ?? "mois") }}',
@@ -517,6 +533,8 @@ function adminListingForm() {
             lat: '{{ old("latitude", $listing->latitude ?? "") }}',
             lng: '{{ old("longitude", $listing->longitude ?? "") }}',
         },
+        aiLoading: false,
+        aiError: '',
         geoLoading: false,
         geoMessage: '',
         previews: @js(collect(old('image_urls', []))->map(fn ($url) => ['type' => 'url', 'src' => $url])->values()),
@@ -618,6 +636,41 @@ function adminListingForm() {
                 this.geoMessage = "Erreur lors de la recherche. Placez le marqueur manuellement.";
             } finally {
                 this.geoLoading = false;
+            }
+        },
+
+        async generateDescription() {
+            if (this.aiLoading) return;
+
+            this.aiLoading = true;
+            this.aiError = '';
+
+            try {
+                const formEl = this.$refs.listingForm;
+                const formData = new FormData(formEl);
+
+                const res = await fetch('{{ route("admin.listings.ai.generate-description") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                        'Accept': 'application/json',
+                    },
+                    body: formData,
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    const firstError = data?.errors ? Object.values(data.errors).flat()[0] : null;
+                    this.aiError = firstError || data?.error || 'Erreur de génération. Réessayez.';
+                    return;
+                }
+
+                this.form.description = data.description || '';
+            } catch (error) {
+                this.aiError = 'Erreur réseau. Réessayez dans un instant.';
+            } finally {
+                this.aiLoading = false;
             }
         },
 

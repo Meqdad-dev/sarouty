@@ -11,6 +11,7 @@ use App\Models\Payment;
 use App\Jobs\NotifyListingApproved;
 use App\Services\AiService;
 use App\Services\MediaStorageService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -452,6 +453,36 @@ class AdminController extends Controller
 
         return redirect()->route('admin.listings.show', $listing)
             ->with('success', "L'annonce a été mise à jour avec succès.");
+    }
+
+    public function aiGenerateDescription(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'title'            => 'required|string|min:5|max:255',
+            'property_type'    => 'required|string',
+            'transaction_type' => 'required|string',
+            'city'             => 'nullable|string',
+            'zone'             => 'nullable|string',
+            'surface'          => 'nullable|numeric',
+            'rooms'            => 'nullable|integer',
+            'bathrooms'        => 'nullable|integer',
+            'price'            => 'nullable|numeric',
+            'furnished'        => 'boolean',
+            'parking'          => 'boolean',
+            'elevator'         => 'boolean',
+            'pool'             => 'boolean',
+            'garden'           => 'boolean',
+            'terrace'          => 'boolean',
+            'security'         => 'boolean',
+        ]);
+
+        $description = $this->ai->generateDescription($validated);
+
+        if (empty($description)) {
+            return response()->json(['error' => 'IA indisponible, réessayez.'], 503);
+        }
+
+        return response()->json(['description' => $description]);
     }
 
     public function listingUpdateStatus(Request $request, Listing $listing)

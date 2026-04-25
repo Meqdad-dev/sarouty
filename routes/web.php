@@ -133,6 +133,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/',                          [AdminController::class, 'listingsIndex'])->name('index');
         Route::get('/creer',                     [AdminController::class, 'listingCreate'])->name('create');
         Route::post('/',                         [AdminController::class, 'listingStore'])->name('store');
+        Route::post('/ai/generate-description',  [AdminController::class, 'aiGenerateDescription'])->name('ai.generate-description')->middleware('throttle:10,1');
         Route::get('/{listing}',                 [AdminController::class, 'listingShow'])->name('show');
         Route::get('/{listing}/modifier',        [AdminController::class, 'listingEdit'])->name('edit');
         Route::put('/{listing}',                 [AdminController::class, 'listingUpdate'])->name('update');
