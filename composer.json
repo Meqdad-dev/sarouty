@@ -4,16 +4,17 @@
     "type": "project",
     "require": {
         "php": "^8.2",
-        "laravel/framework": "^11.0",
-        "laravel/breeze": "^2.0",
-        "laravel/sanctum": "^4.0",
+        "cloudinary-labs/cloudinary-laravel": "^3.0",
         "guzzlehttp/guzzle": "^7.0",
-        "openai-php/laravel": "^0.10",
-        "mailgun/mailgun-php": "^4.0",
-        "twilio/sdk": "^8.0",
-        "stripe/stripe-php": "^16.0",
         "intervention/image": "^3.0",
-        "spatie/laravel-medialibrary": "^11.0"
+        "laravel/breeze": "^2.0",
+        "laravel/framework": "^11.0",
+        "laravel/sanctum": "^4.0",
+        "mailgun/mailgun-php": "^4.0",
+        "openai-php/laravel": "^0.10",
+        "spatie/laravel-medialibrary": "^11.0",
+        "stripe/stripe-php": "^16.0",
+        "twilio/sdk": "^8.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
