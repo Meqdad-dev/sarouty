@@ -52,6 +52,11 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
  && echo "opcache.max_accelerated_files=10000" >> /usr/local/etc/php/conf.d/opcache.ini \
  && echo "opcache.validate_timestamps=0" >> /usr/local/etc/php/conf.d/opcache.ini
 
+# Uploads and Memory configuration
+RUN echo "upload_max_filesize=50M" >> /usr/local/etc/php/conf.d/uploads.ini \
+ && echo "post_max_size=50M" >> /usr/local/etc/php/conf.d/uploads.ini \
+ && echo "memory_limit=256M" >> /usr/local/etc/php/conf.d/uploads.ini
+
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -74,6 +79,10 @@ RUN mkdir -p storage/logs \
              bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache \
  && chown -R www-data:www-data /var/www
+
+# Fix Nginx permissions for large file uploads
+RUN mkdir -p /var/lib/nginx/tmp/client_body \
+ && chown -R www-data:www-data /var/lib/nginx
 
 # Copy Docker configs
 COPY docker/nginx.conf.template /etc/nginx/nginx.conf.template
