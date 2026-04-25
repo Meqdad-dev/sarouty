@@ -59,15 +59,15 @@
     {{-- Spinner de transition global dynamique (Clé et Maison) --}}
     <style>
         .sarouty-loader .key-icon {
-            animation: keyUnlock 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            animation: keyUnlock 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
             /* Le point d'origine tourne autour de la boucle de la clé (en haut à droite dans ce svg) */
             transform-origin: 80% 20%; 
         }
         .sarouty-loader .house-icon {
-            animation: houseReact 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            animation: houseReact 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
         }
         .sarouty-loader .glow-circle {
-            animation: glowPulse 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            animation: glowPulse 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         @keyframes keyUnlock {
