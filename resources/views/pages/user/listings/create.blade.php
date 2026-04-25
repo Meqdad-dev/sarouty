@@ -183,7 +183,7 @@
                     <div x-show="form.property_type === 'appartement'" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Salles de bain</label>
-                            <select name="bathrooms" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
+                            <select name="bathrooms" x-model="form.bathrooms" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
                                 <option value="">—</option>
                                 @for($i = 1; $i <= 5; $i++)
                                     <option value="{{ $i }}" {{ old('bathrooms', $listing->bathrooms ?? '') == $i ? 'selected' : '' }}>{{ $i }}</option>
@@ -216,7 +216,7 @@
                     <div x-show="form.property_type === 'villa'" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Salles de bain</label>
-                            <select name="bathrooms" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
+                            <select name="bathrooms" x-model="form.bathrooms" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
                                 <option value="">—</option>
                                 @for($i = 1; $i <= 8; $i++)
                                     <option value="{{ $i }}" {{ old('bathrooms', $listing->bathrooms ?? '') == $i ? 'selected' : '' }}>{{ $i }}</option>
@@ -264,7 +264,7 @@
                     <div x-show="form.property_type === 'riad'" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Salles de bain</label>
-                            <select name="bathrooms" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
+                            <select name="bathrooms" x-model="form.bathrooms" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
                                 <option value="">—</option>
                                 @for($i = 1; $i <= 10; $i++)
                                     <option value="{{ $i }}" {{ old('bathrooms', $listing->bathrooms ?? '') == $i ? 'selected' : '' }}>{{ $i }}</option>
@@ -295,7 +295,7 @@
                     <div x-show="form.property_type === 'maison'" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Salles de bain</label>
-                            <select name="bathrooms" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
+                            <select name="bathrooms" x-model="form.bathrooms" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
                                 <option value="">—</option>
                                 @for($i = 1; $i <= 8; $i++)
                                     <option value="{{ $i }}" {{ old('bathrooms', $listing->bathrooms ?? '') == $i ? 'selected' : '' }}>{{ $i }}</option>
@@ -318,7 +318,7 @@
                     <div x-show="form.property_type === 'ferme'" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Salles de bain</label>
-                            <select name="bathrooms" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
+                            <select name="bathrooms" x-model="form.bathrooms" class="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none">
                                 <option value="">—</option>
                                 @for($i = 1; $i <= 6; $i++)
                                     <option value="{{ $i }}" {{ old('bathrooms', $listing->bathrooms ?? '') == $i ? 'selected' : '' }}>{{ $i }}</option>
@@ -640,6 +640,7 @@ function listingForm(maxImagesLimit = 5) {
             price_period:'{{ old("price_period", $listing->price_period ?? "mois") }}',
             surface:     '{{ old("surface",     $listing->surface     ?? "") }}',
             rooms:       '{{ old("rooms",       $listing->rooms       ?? "") }}',
+            bathrooms:   '{{ old("bathrooms",   $listing->bathrooms   ?? "") }}',
             city:        '{{ old("city",        $listing->city        ?? "") }}',
             zone:        '{{ old("zone",        $listing->zone        ?? "") }}',
             address:     '{{ old("address",     $listing->address     ?? "") }}',
@@ -807,6 +808,7 @@ function listingForm(maxImagesLimit = 5) {
                         zone:      this.form.zone,
                         surface:   this.form.surface,
                         rooms:     this.form.rooms,
+                        bathrooms: this.form.bathrooms,
                         price:     this.form.price,
                         furnished: this.form.furnished,
                         parking:   this.form.parking,
@@ -818,6 +820,11 @@ function listingForm(maxImagesLimit = 5) {
                     }),
                 });
                 const data = await res.json();
+                if (!res.ok) {
+                    const firstError = data?.errors ? Object.values(data.errors).flat()[0] : null;
+                    this.aiError = firstError || data.error || 'Erreur de génération. Réessayez.';
+                    return;
+                }
                 if (data.description) {
                     this.form.description = data.description;
                 } else {

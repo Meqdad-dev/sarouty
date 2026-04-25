@@ -16,9 +16,11 @@ class AiService
     {
         $prompt = $this->buildDescriptionPrompt($data);
 
-        // Mode démo si pas de clé valide
-        $apiKey = env('OPENAI_API_KEY', '');
-        if (empty($apiKey) || str_contains($apiKey, 'your_openai_api_key')) {
+        // En production (Railway + config:cache), il faut lire la clé depuis la configuration
+        // et non directement via env() dans un service Laravel.
+        $apiKey = (string) config('services.openai.api_key', '');
+        if (blank($apiKey) || str_contains($apiKey, 'your_openai_api_key')) {
+            Log::warning('OpenAI API key missing or invalid in services.openai.api_key');
             $type = ucfirst($data['property_type'] ?? 'bien');
             $city = $data['city'] ?? 'ville';
             $zone = !empty($data['zone']) ? " dans le quartier prisé de {$data['zone']}" : "";
