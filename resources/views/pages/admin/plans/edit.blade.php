@@ -35,7 +35,7 @@
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom du forfait *</label>
                             <input type="text" name="name" value="{{ old('name', $plan->name) }}" required {{ $plan->slug === 'gratuit' ? 'readonly' : '' }}
-                                   class="w-full border-gray-200 dark:border-gray-700 rounded-xl focus:ring-gold focus:border-gold px-4 py-2.5 {{ $plan->slug === 'gratuit' ? 'bg-gray-100 dark:bg-gray-900 text-gray-500' : 'bg-white dark:bg-gray-800' }}">
+                                   class="w-full border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-gold focus:border-gold px-4 py-2.5 {{ $plan->slug === 'gratuit' ? 'bg-gray-100 dark:bg-gray-900 text-gray-500' : 'bg-white dark:bg-gray-800' }}">
                             @if($plan->slug === 'gratuit')
                                 <p class="text-xs text-gray-500 mt-1">Le nom du plan gratuit ne peut pas être modifié.</p>
                             @endif
@@ -46,7 +46,7 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prix (MAD) *</label>
                             <div class="relative">
                                 <input type="number" step="0.01" name="price" value="{{ old('price', $plan->price) }}" required
-                                       class="w-full border-gray-200 dark:border-gray-700 rounded-xl dark:bg-gray-800 focus:ring-gold focus:border-gold pl-4 pr-12 py-2.5">
+                                       class="w-full border border-gray-200 dark:border-gray-700 rounded-xl dark:bg-gray-800 focus:ring-gold focus:border-gold pl-4 pr-12 py-2.5">
                                 <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">MAD</div>
                             </div>
                             @error('price')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
@@ -55,7 +55,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Période (jours)</label>
                             <input type="number" name="duration_days" value="{{ old('duration_days', $plan->duration_days) }}"
-                                   class="w-full border-gray-200 dark:border-gray-700 rounded-xl dark:bg-gray-800 focus:ring-gold focus:border-gold px-4 py-2.5">
+                                   class="w-full border border-gray-200 dark:border-gray-700 rounded-xl dark:bg-gray-800 focus:ring-gold focus:border-gold px-4 py-2.5">
                         </div>
 
                         <div class="md:col-span-2">
@@ -70,7 +70,7 @@
                                 }
                             @endphp
                             <textarea name="features" rows="5"
-                                      class="w-full border-gray-200 dark:border-gray-700 rounded-xl dark:bg-gray-800 focus:ring-gold focus:border-gold px-4 py-3">{{ old('features', implode("\n", $featuresData)) }}</textarea>
+                                      class="w-full border border-gray-200 dark:border-gray-700 rounded-xl dark:bg-gray-800 focus:ring-gold focus:border-gold px-4 py-3">{{ old('features', implode("\n", $featuresData)) }}</textarea>
                             @error('features')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                         </div>
                     </div>
@@ -94,12 +94,12 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Quota total d'annonces</label>
                                     <input type="number" name="max_ads_particulier" value="{{ old('max_ads_particulier', $plan->max_ads_particulier) }}" required
-                                           class="w-full border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 focus:ring-gold focus:border-gold px-3 py-2">
+                                           class="w-full border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 focus:ring-gold focus:border-gold px-3 py-2">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Images par annonce</label>
                                     <input type="number" name="max_images_particulier" value="{{ old('max_images_particulier', $plan->max_images_particulier) }}" required
-                                           class="w-full border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 focus:ring-gold focus:border-gold px-3 py-2">
+                                           class="w-full border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 focus:ring-gold focus:border-gold px-3 py-2">
                                 </div>
                             </div>
                         </div>
@@ -110,12 +110,12 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Quota total d'annonces</label>
                                     <input type="number" name="max_ads_agent" value="{{ old('max_ads_agent', $plan->max_ads_agent) }}" required
-                                           class="w-full border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 focus:ring-gold focus:border-gold px-3 py-2">
+                                           class="w-full border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 focus:ring-gold focus:border-gold px-3 py-2">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Images par annonce</label>
                                     <input type="number" name="max_images_agent" value="{{ old('max_images_agent', $plan->max_images_agent) }}" required
-                                           class="w-full border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 focus:ring-gold focus:border-gold px-3 py-2">
+                                           class="w-full border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 focus:ring-gold focus:border-gold px-3 py-2">
                                 </div>
                             </div>
                         </div>
@@ -151,17 +151,17 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priorité d'affichage *</label>
                             <input type="number" name="priority_level" value="{{ old('priority_level', $plan->priority_level) }}" required
-                                   class="w-full border-gray-200 dark:border-gray-700 rounded-xl dark:bg-gray-800 focus:ring-gold focus:border-gold px-4 py-2.5">
+                                   class="w-full border border-gray-200 dark:border-gray-700 rounded-xl dark:bg-gray-800 focus:ring-gold focus:border-gold px-4 py-2.5">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Durée standard (jours) *</label>
                             <input type="number" name="listing_duration_days" value="{{ old('listing_duration_days', $plan->listing_duration_days) }}" required
-                                   class="w-full border-gray-200 dark:border-gray-700 rounded-xl dark:bg-gray-800 focus:ring-gold focus:border-gold px-4 py-2.5">
+                                   class="w-full border border-gray-200 dark:border-gray-700 rounded-xl dark:bg-gray-800 focus:ring-gold focus:border-gold px-4 py-2.5">
                         </div>
                         <div class="pt-2 border-t border-gray-100 dark:border-gray-700">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Durée sponsorisation (jours) *</label>
                             <input type="number" name="sponsored_listing_duration_days" value="{{ old('sponsored_listing_duration_days', $plan->sponsored_listing_duration_days) }}" required
-                                   class="w-full border-gray-200 dark:border-gray-700 rounded-xl dark:bg-gray-800 focus:ring-gold focus:border-gold px-4 py-2.5">
+                                   class="w-full border border-gray-200 dark:border-gray-700 rounded-xl dark:bg-gray-800 focus:ring-gold focus:border-gold px-4 py-2.5">
 
                             <label class="flex items-center gap-2 cursor-pointer mt-3 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
                                 <input type="hidden" name="can_create_sponsored_listing" value="0">
