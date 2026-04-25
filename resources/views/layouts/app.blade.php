@@ -56,6 +56,39 @@
 </head>
 <body class="antialiased">
 
+    {{-- Spinner de transition global --}}
+    <div id="page-transition-spinner" class="fixed inset-0 z-[9999] bg-sand flex flex-col items-center justify-center transition-opacity duration-300 hidden opacity-0">
+        <div class="relative w-24 h-24 flex items-center justify-center mb-4">
+            <svg class="absolute inset-0 w-full h-full text-gold animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                <path class="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="font-display font-bold text-3xl text-ink absolute">S</span>
+        </div>
+        <div class="font-display text-gold font-bold text-xl tracking-[0.2em] animate-pulse">SAROUTY</div>
+    </div>
+    
+    <script>
+        window.addEventListener('beforeunload', function (e) {
+            // Ignore for downloads or specific links if needed
+            const spinner = document.getElementById('page-transition-spinner');
+            spinner.classList.remove('hidden');
+            setTimeout(() => {
+                spinner.classList.remove('opacity-0');
+            }, 10);
+        });
+        window.addEventListener('pageshow', function (e) {
+            // Hide spinner when going back in history
+            if (e.persisted) {
+                const spinner = document.getElementById('page-transition-spinner');
+                spinner.classList.add('opacity-0');
+                setTimeout(() => {
+                    spinner.classList.add('hidden');
+                }, 300);
+            }
+        });
+    </script>
+
     @include('layouts.navbar')
 
     {{-- Flash messages --}}

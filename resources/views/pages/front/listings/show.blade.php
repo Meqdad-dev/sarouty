@@ -266,40 +266,6 @@
                     </div>
                 @endif
 
-                {{-- Signaler --}}
-                <div class="bg-white rounded-2xl p-4 shadow-sm border border-sand/60">
-                    <details class="group">
-                        <summary class="flex items-center gap-2 text-sm text-ink/50 cursor-pointer hover:text-ink/70">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                            </svg>
-                            Signaler cette annonce
-                        </summary>
-                        <div class="mt-4">
-                            @auth
-                                <form action="{{ route('listings.report', $listing) }}" method="POST" class="space-y-3">
-                                    @csrf
-                                    <select name="reason" required class="w-full px-3 py-2 bg-sand rounded-lg text-sm border-0 focus:ring-2 focus:ring-gold/30 text-ink">
-                                        <option value="">Raison du signalement...</option>
-                                        @foreach(\App\Models\Report::REASONS as $value => $label)
-                                            <option value="{{ $value }}">{{ $label }}</option>
-                                        @endforeach
-                                    </select>
-                                    <textarea name="description" rows="2" placeholder="Détails (optionnel)"
-                                              class="w-full px-3 py-2 bg-sand rounded-lg text-sm border-0 focus:ring-2 focus:ring-gold/30 text-ink resize-none placeholder:text-ink/40"></textarea>
-                                    <button type="submit" class="bg-red-50 text-red-600 hover:bg-red-100 text-sm font-medium px-4 py-2 rounded-lg transition-colors">
-                                        Envoyer le signalement
-                                    </button>
-                                </form>
-                            @else
-                                <div class="bg-sand rounded-lg p-3 text-center text-sm text-ink/60">
-                                    Vous devez être connecté pour signaler une annonce.<br>
-                                    <a href="{{ route('login') }}" class="text-gold hover:underline font-medium mt-1 inline-block">Se connecter</a>
-                                </div>
-                            @endauth
-                        </div>
-                    </details>
-                </div>
             </div>
 
             {{-- ── Sidebar droite (1/3) ── --}}
@@ -373,6 +339,42 @@
                             Réf. DM-{{ str_pad($listing->id, 6, '0', STR_PAD_LEFT) }}
                         </p>
                     </div>
+
+                    {{-- Signaler --}}
+                    <div class="mt-6 border-t border-sand pt-6">
+                        <details class="group">
+                            <summary class="flex items-center justify-center gap-2 text-sm text-red-600 font-bold cursor-pointer hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 py-3 px-4 rounded-xl transition-all shadow-sm">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                                Signaler cette annonce
+                            </summary>
+                            <div class="mt-4 bg-white border border-red-100 rounded-xl p-4 shadow-sm">
+                                @auth
+                                    <form action="{{ route('listings.report', $listing) }}" method="POST" class="space-y-3">
+                                        @csrf
+                                        <select name="reason" required class="w-full px-3 py-2.5 bg-sand rounded-xl text-sm border-0 focus:ring-2 focus:ring-red-400 text-ink">
+                                            <option value="">Raison du signalement...</option>
+                                            @foreach(\App\Models\Report::REASONS as $value => $label)
+                                                <option value="{{ $value }}">{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                        <textarea name="description" rows="3" placeholder="Détails (optionnel)"
+                                                  class="w-full px-3 py-2.5 bg-sand rounded-xl text-sm border-0 focus:ring-2 focus:ring-red-400 text-ink resize-none placeholder:text-ink/40"></textarea>
+                                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors shadow-md">
+                                            Envoyer le signalement
+                                        </button>
+                                    </form>
+                                @else
+                                    <div class="bg-red-50 rounded-xl p-4 text-center text-sm text-red-800">
+                                        Vous devez être connecté pour signaler une annonce.<br>
+                                        <a href="{{ route('login') }}" class="text-red-600 hover:underline font-bold mt-2 inline-block">Se connecter</a>
+                                    </div>
+                                @endauth
+                            </div>
+                        </details>
+                    </div>
+
                 </div>
             </div>
         </div>

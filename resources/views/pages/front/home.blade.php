@@ -672,14 +672,24 @@
                 <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 mb-6 text-center relative overflow-hidden">
                     <div class="absolute inset-0 opacity-10" style="background:radial-gradient(circle at 70% 30%,#C8963E,transparent);"></div>
                     <div class="relative">
-                        <div class="text-white/50 text-sm mb-2">Valeur estimée</div>
+                        <div class="text-white/50 text-sm mb-2" id="estim-result-title">Valeur estimée</div>
                         <div id="estim-price-mid" class="font-display text-4xl font-bold text-gold mb-1">—</div>
-                        <div class="text-white/40 text-sm">MAD</div>
+                        <div class="text-white/40 text-sm" id="estim-currency">MAD</div>
                         <div id="estim-result-desc" class="text-white/40 text-sm mt-3"></div>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/10">
+                        
+                        {{-- Grille Vente --}}
+                        <div id="estim-grid-vente" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/10">
                             <div><div class="text-white/40 text-xs mb-1">Estimation basse</div><div id="estim-price-min" class="text-white font-semibold text-sm">—</div></div>
                             <div class="border-x border-white/10"><div class="text-white/40 text-xs mb-1">Prix au m²</div><div id="estim-price-sqm" class="text-gold font-semibold text-sm">—</div></div>
                             <div><div class="text-white/40 text-xs mb-1">Estimation haute</div><div id="estim-price-max" class="text-white font-semibold text-sm">—</div></div>
+                        </div>
+                        
+                        {{-- Grille Location --}}
+                        <div id="estim-grid-location" class="hidden grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-white/10">
+                            <div><div class="text-white/40 text-xs mb-1">Par jour</div><div id="estim-rent-day" class="text-white font-semibold text-sm">—</div></div>
+                            <div class="border-l border-white/10"><div class="text-white/40 text-xs mb-1">Par semaine</div><div id="estim-rent-week" class="text-gold font-semibold text-sm">—</div></div>
+                            <div class="border-l border-white/10"><div class="text-white/40 text-xs mb-1">Par mois</div><div id="estim-rent-month" class="text-white font-semibold text-sm">—</div></div>
+                            <div class="border-l border-white/10"><div class="text-white/40 text-xs mb-1">Par an</div><div id="estim-rent-year" class="text-gold font-semibold text-sm">—</div></div>
                         </div>
                     </div>
                 </div>
@@ -1077,10 +1087,41 @@ function eComputeAndGo(){
     document.getElementById('estim-result-desc').textContent =
         (typeLabels[type]||type) + ' • ' + (eD.city||'Maroc') + ' • ' + surface+' m²';
 
-    animateVal('estim-price-mid', 0, eResult.mid, 900, v=>fmt(v)+' MAD');
-    document.getElementById('estim-price-min').textContent = fmt(eResult.min)+' MAD';
-    document.getElementById('estim-price-max').textContent = fmt(eResult.max)+' MAD';
-    document.getElementById('estim-price-sqm').textContent = fmt(eResult.sqm)+' MAD/m²';
+    const isRental = (eD.transaction === 'location' || eD.transaction === 'vacances');
+    
+    if (isRental) {
+        // Location (Rental yield assumption: 6% for long term, 8% for short term)
+        const yieldRate = eD.transaction === 'vacances' ? 0.08 : 0.06;
+        const annualRent = eResult.mid * yieldRate;
+        const monthRent = annualRent / 12;
+        const weekRent = annualRent / 52;
+        const dayRent = annualRent / 365;
+        
+        document.getElementById('estim-result-title').textContent = 'Loyer estimé (Mois)';
+        document.getElementById('estim-currency').textContent = 'MAD / mois';
+        animateVal('estim-price-mid', 0, monthRent, 900, v=>fmt(v));
+        
+        document.getElementById('estim-rent-day').textContent = fmt(dayRent) + ' MAD';
+        document.getElementById('estim-rent-week').textContent = fmt(weekRent) + ' MAD';
+        document.getElementById('estim-rent-month').textContent = fmt(monthRent) + ' MAD';
+        document.getElementById('estim-rent-year').textContent = fmt(annualRent) + ' MAD';
+        
+        document.getElementById('estim-grid-vente').classList.add('hidden');
+        document.getElementById('estim-grid-location').classList.remove('hidden');
+        document.getElementById('estim-grid-location').classList.add('grid');
+    } else {
+        document.getElementById('estim-result-title').textContent = 'Valeur estimée';
+        document.getElementById('estim-currency').textContent = 'MAD';
+        animateVal('estim-price-mid', 0, eResult.mid, 900, v=>fmt(v));
+        
+        document.getElementById('estim-price-min').textContent = fmt(eResult.min)+' MAD';
+        document.getElementById('estim-price-max').textContent = fmt(eResult.max)+' MAD';
+        document.getElementById('estim-price-sqm').textContent = fmt(eResult.sqm)+' MAD/m²';
+        
+        document.getElementById('estim-grid-location').classList.add('hidden');
+        document.getElementById('estim-grid-location').classList.remove('grid');
+        document.getElementById('estim-grid-vente').classList.remove('hidden');
+    }
 
     estimGoTo(6);
 }
