@@ -21,12 +21,7 @@ class AiService
         $apiKey = (string) config('services.openai.api_key', '');
         if (blank($apiKey) || str_contains($apiKey, 'your_openai_api_key')) {
             Log::warning('OpenAI API key missing or invalid in services.openai.api_key');
-            $type = ucfirst($data['property_type'] ?? 'bien');
-            $city = $data['city'] ?? 'ville';
-            $zone = !empty($data['zone']) ? " dans le quartier prisé de {$data['zone']}" : "";
-            $surface = !empty($data['surface']) ? " d'une belle surface de {$data['surface']} m²" : "";
-            
-            return "Découvrez ce superbe {$type} situé à {$city}{$zone}. Ce bien exceptionnel{$surface} vous séduira par son charme et ses prestations de qualité.\n\nBaigné de lumière, il offre des volumes généreux et un agencement optimisé pour votre confort au quotidien. Son emplacement privilégié vous permet de profiter du calme tout en restant à proximité des commodités.\n\nUne véritable opportunité sur le marché immobilier ! N'hésitez pas à nous contacter pour plus d'informations ou pour organiser une visite.";
+            return $this->buildFallbackDescription($data);
         }
 
         try {
@@ -46,7 +41,8 @@ class AiService
             return $response->choices[0]->message->content;
         } catch (\Exception $e) {
             Log::error('OpenAI generateDescription error: ' . $e->getMessage());
-            return '';
+            // Fallback : générer une description générique à partir des données
+            return $this->buildFallbackDescription($data);
         }
     }
 
@@ -172,6 +168,35 @@ class AiService
     }
 
     // ─── Méthodes privées ─────────────────────────────────────────────────────
+
+    private function buildFallbackDescription(array $data): string
+    {
+        $type = ucfirst($data['property_type'] ?? 'bien');
+        $transac = $data['transaction_type'] ?? 'vente';
+        $city = $data['city'] ?? 'ville';
+        $zone = !empty($data['zone']) ? " dans le quartier prisé de {$data['zone']}" : '';
+        $surface = !empty($data['surface']) ? " d'une surface de {$data['surface']} m²" : '';
+        $rooms = !empty($data['rooms']) ? ", comprenant {$data['rooms']} pièce(s)" : '';
+        $action = in_array($transac, ['location', 'vacances']) ? 'louer' : 'acquérir';
+
+        $amenities = array_filter([
+            !empty($data['furnished']) ? 'meublé' : null,
+            !empty($data['parking'])   ? 'avec parking' : null,
+            !empty($data['elevator'])  ? 'avec ascenseur' : null,
+            !empty($data['pool'])      ? 'avec piscine' : null,
+            !empty($data['garden'])    ? 'avec jardin' : null,
+            !empty($data['terrace'])   ? 'avec terrasse' : null,
+            !empty($data['security'])  ? 'avec gardiennage' : null,
+        ]);
+        $amenitiesStr = !empty($amenities) ? ' ' . implode(', ', $amenities) . ',' : '';
+
+        return "Découvrez ce superbe {$type} situé à {$city}{$zone}{$surface}{$rooms}."
+            . " Ce bien exceptionnel{$amenitiesStr} vous séduira par son charme et ses prestations de qualité.\n\n"
+            . "Baigné de lumière, il offre des volumes généreux et un agencement optimisé pour votre confort au quotidien."
+            . " Son emplacement privilégié vous permet de profiter du calme tout en restant à proximité des commodités.\n\n"
+            . "Une véritable opportunité à {$action} sur le marché immobilier marocain !"
+            . " N'hésitez pas à nous contacter pour plus d'informations ou pour organiser une visite.";
+    }
 
     private function buildDescriptionPrompt(array $data): string
     {
